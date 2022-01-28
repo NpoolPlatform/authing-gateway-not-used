@@ -8,9 +8,7 @@ metadata:
     k8s.kuboard.cn/workload: authing-gateway-traefik
     kubernetes.io/ingress.class: "traefik-internet"
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    traefik.ingress.kubernetes.io/router.middlewares:
-      - kube-system-strip-authing-gateway-prefix@kubernetescrd
-      - kube-system-headers-appid-to-body@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-strip-authing-gateway-prefix@kubernetescrd,kube-system-headers-appid-to-body@kubernetescrd
 
 spec:
   rules:
