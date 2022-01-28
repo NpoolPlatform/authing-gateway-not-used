@@ -7,9 +7,10 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/NpoolPlatform/go-service-app-template/pkg/db/ent/migrate"
+	"github.com/NpoolPlatform/authing-gateway/pkg/db/ent/migrate"
+	"github.com/google/uuid"
 
-	"github.com/NpoolPlatform/go-service-app-template/pkg/db/ent/empty"
+	"github.com/NpoolPlatform/authing-gateway/pkg/db/ent/authhistory"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -20,8 +21,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
-	// Empty is the client for interacting with the Empty builders.
-	Empty *EmptyClient
+	// AuthHistory is the client for interacting with the AuthHistory builders.
+	AuthHistory *AuthHistoryClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -35,7 +36,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
-	c.Empty = NewEmptyClient(c.config)
+	c.AuthHistory = NewAuthHistoryClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -67,9 +68,9 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Empty:  NewEmptyClient(cfg),
+		ctx:         ctx,
+		config:      cfg,
+		AuthHistory: NewAuthHistoryClient(cfg),
 	}, nil
 }
 
@@ -87,16 +88,16 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Empty:  NewEmptyClient(cfg),
+		ctx:         ctx,
+		config:      cfg,
+		AuthHistory: NewAuthHistoryClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Empty.
+//		AuthHistory.
 //		Query().
 //		Count(ctx)
 //
@@ -119,87 +120,87 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Empty.Use(hooks...)
+	c.AuthHistory.Use(hooks...)
 }
 
-// EmptyClient is a client for the Empty schema.
-type EmptyClient struct {
+// AuthHistoryClient is a client for the AuthHistory schema.
+type AuthHistoryClient struct {
 	config
 }
 
-// NewEmptyClient returns a client for the Empty from the given config.
-func NewEmptyClient(c config) *EmptyClient {
-	return &EmptyClient{config: c}
+// NewAuthHistoryClient returns a client for the AuthHistory from the given config.
+func NewAuthHistoryClient(c config) *AuthHistoryClient {
+	return &AuthHistoryClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `empty.Hooks(f(g(h())))`.
-func (c *EmptyClient) Use(hooks ...Hook) {
-	c.hooks.Empty = append(c.hooks.Empty, hooks...)
+// A call to `Use(f, g, h)` equals to `authhistory.Hooks(f(g(h())))`.
+func (c *AuthHistoryClient) Use(hooks ...Hook) {
+	c.hooks.AuthHistory = append(c.hooks.AuthHistory, hooks...)
 }
 
-// Create returns a create builder for Empty.
-func (c *EmptyClient) Create() *EmptyCreate {
-	mutation := newEmptyMutation(c.config, OpCreate)
-	return &EmptyCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a create builder for AuthHistory.
+func (c *AuthHistoryClient) Create() *AuthHistoryCreate {
+	mutation := newAuthHistoryMutation(c.config, OpCreate)
+	return &AuthHistoryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of Empty entities.
-func (c *EmptyClient) CreateBulk(builders ...*EmptyCreate) *EmptyCreateBulk {
-	return &EmptyCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of AuthHistory entities.
+func (c *AuthHistoryClient) CreateBulk(builders ...*AuthHistoryCreate) *AuthHistoryCreateBulk {
+	return &AuthHistoryCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for Empty.
-func (c *EmptyClient) Update() *EmptyUpdate {
-	mutation := newEmptyMutation(c.config, OpUpdate)
-	return &EmptyUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for AuthHistory.
+func (c *AuthHistoryClient) Update() *AuthHistoryUpdate {
+	mutation := newAuthHistoryMutation(c.config, OpUpdate)
+	return &AuthHistoryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *EmptyClient) UpdateOne(e *Empty) *EmptyUpdateOne {
-	mutation := newEmptyMutation(c.config, OpUpdateOne, withEmpty(e))
-	return &EmptyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *AuthHistoryClient) UpdateOne(ah *AuthHistory) *AuthHistoryUpdateOne {
+	mutation := newAuthHistoryMutation(c.config, OpUpdateOne, withAuthHistory(ah))
+	return &AuthHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *EmptyClient) UpdateOneID(id int) *EmptyUpdateOne {
-	mutation := newEmptyMutation(c.config, OpUpdateOne, withEmptyID(id))
-	return &EmptyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *AuthHistoryClient) UpdateOneID(id uuid.UUID) *AuthHistoryUpdateOne {
+	mutation := newAuthHistoryMutation(c.config, OpUpdateOne, withAuthHistoryID(id))
+	return &AuthHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for Empty.
-func (c *EmptyClient) Delete() *EmptyDelete {
-	mutation := newEmptyMutation(c.config, OpDelete)
-	return &EmptyDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for AuthHistory.
+func (c *AuthHistoryClient) Delete() *AuthHistoryDelete {
+	mutation := newAuthHistoryMutation(c.config, OpDelete)
+	return &AuthHistoryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a delete builder for the given entity.
-func (c *EmptyClient) DeleteOne(e *Empty) *EmptyDeleteOne {
-	return c.DeleteOneID(e.ID)
+func (c *AuthHistoryClient) DeleteOne(ah *AuthHistory) *AuthHistoryDeleteOne {
+	return c.DeleteOneID(ah.ID)
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *EmptyClient) DeleteOneID(id int) *EmptyDeleteOne {
-	builder := c.Delete().Where(empty.ID(id))
+func (c *AuthHistoryClient) DeleteOneID(id uuid.UUID) *AuthHistoryDeleteOne {
+	builder := c.Delete().Where(authhistory.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &EmptyDeleteOne{builder}
+	return &AuthHistoryDeleteOne{builder}
 }
 
-// Query returns a query builder for Empty.
-func (c *EmptyClient) Query() *EmptyQuery {
-	return &EmptyQuery{
+// Query returns a query builder for AuthHistory.
+func (c *AuthHistoryClient) Query() *AuthHistoryQuery {
+	return &AuthHistoryQuery{
 		config: c.config,
 	}
 }
 
-// Get returns a Empty entity by its id.
-func (c *EmptyClient) Get(ctx context.Context, id int) (*Empty, error) {
-	return c.Query().Where(empty.ID(id)).Only(ctx)
+// Get returns a AuthHistory entity by its id.
+func (c *AuthHistoryClient) Get(ctx context.Context, id uuid.UUID) (*AuthHistory, error) {
+	return c.Query().Where(authhistory.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *EmptyClient) GetX(ctx context.Context, id int) *Empty {
+func (c *AuthHistoryClient) GetX(ctx context.Context, id uuid.UUID) *AuthHistory {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -208,6 +209,6 @@ func (c *EmptyClient) GetX(ctx context.Context, id int) *Empty {
 }
 
 // Hooks returns the client hooks.
-func (c *EmptyClient) Hooks() []Hook {
-	return c.hooks.Empty
+func (c *AuthHistoryClient) Hooks() []Hook {
+	return c.hooks.AuthHistory
 }

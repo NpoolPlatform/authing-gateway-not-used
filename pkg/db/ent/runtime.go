@@ -2,8 +2,24 @@
 
 package ent
 
+import (
+	"github.com/NpoolPlatform/authing-gateway/pkg/db/ent/authhistory"
+	"github.com/NpoolPlatform/authing-gateway/pkg/db/ent/schema"
+	"github.com/google/uuid"
+)
+
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	authhistoryFields := schema.AuthHistory{}.Fields()
+	_ = authhistoryFields
+	// authhistoryDescCreateAt is the schema descriptor for create_at field.
+	authhistoryDescCreateAt := authhistoryFields[5].Descriptor()
+	// authhistory.DefaultCreateAt holds the default value on creation for the create_at field.
+	authhistory.DefaultCreateAt = authhistoryDescCreateAt.Default.(func() uint32)
+	// authhistoryDescID is the schema descriptor for id field.
+	authhistoryDescID := authhistoryFields[0].Descriptor()
+	// authhistory.DefaultID holds the default value on creation for the id field.
+	authhistory.DefaultID = authhistoryDescID.Default.(func() uuid.UUID)
 }
