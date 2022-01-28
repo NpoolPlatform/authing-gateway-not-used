@@ -10,7 +10,7 @@ metadata:
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
     traefik.ingress.kubernetes.io/router.middlewares:
       - kube-system-strip-authing-gateway-prefix@kubernetescrd
-      - kube-system-cookies-appid-to-body@kubernetescrd
+      - kube-system-headers-appid-to-body@kubernetescrd
 
 spec:
   rules:
