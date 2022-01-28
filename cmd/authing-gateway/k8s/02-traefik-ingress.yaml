@@ -15,7 +15,7 @@ spec:
     - host: api.npool.top
       http: &http_rules
         paths:
-          - path: /api/authing-gateway
+          - path: /api/authing-gateway/version
             backend:
               serviceName: authing-gateway
               servicePort: 50250
