@@ -1,10 +1,10 @@
 ---
 config:
   hostname: "authing-gateway.npool.top"
-  http_port: 32759
-  grpc_port: 32789
-  healthz_port: 32799
+  http_port: 50250
+  grpc_port: 50251
+  healthz_port: 50252
   appid: "89089012783789789719823798127398"
-  serviceid: "caadc05c-6567-11ec-9cbb-437ed39f0016"
+  serviceid: "111cf39c-7fde-11ec-9374-069013a3cb9a"
   logdir: "./"
   apolloAccessKey: "0147fb70b815403790e8634b899fac07"

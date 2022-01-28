@@ -46,8 +46,14 @@ metadata:
   namespace: kube-system
 spec:
   ports:
-  - name: api
-    port: 32759
-    targetPort: 32759
+  - name: http
+    port: 50250
+    targetPort: 50250
+  - name: grpc
+    port: 50251
+    targetPort: 50251
+  - name: prometheus
+    port: 50252
+    targetPort: 50252
   selector:
     app: service-sample
