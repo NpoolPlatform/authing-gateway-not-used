@@ -8,7 +8,11 @@ metadata:
     k8s.kuboard.cn/workload: authing-gateway-traefik
     kubernetes.io/ingress.class: "traefik-internet"
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    traefik.ingress.kubernetes.io/router.middlewares: kube-system-strip-authing-gateway-prefix@kubernetescrd,kube-system-headers-appid-to-body@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-strip-authing-gateway-prefix@kubernetescrd,
+                                                      kube-system-headers-appid-to-body@kubernetescrd,
+                                                      kube-system-headers-userid-to-body@kubernetescrd,
+                                                      kube-system-headers-app-login-token-to-body@kubernetescrd,
+                                                      kube-system-app-rbac-auth@kubernetescrd
 
 spec:
   rules:
@@ -28,14 +32,3 @@ spec:
     - host: dashboard.xpool.top
       http: *http_rules
 
----
-
-apiVersion: traefik.containo.us/v1alpha1
-kind: Middleware
-metadata:
-  name: strip-authing-gateway-prefix
-  namespace: kube-system
-spec:
-  stripPrefix:
-    prefixes:
-      - /api/authing-gateway
