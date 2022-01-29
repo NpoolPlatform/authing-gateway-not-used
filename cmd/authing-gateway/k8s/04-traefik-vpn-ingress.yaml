@@ -22,11 +22,7 @@ spec:
             backend:
               serviceName: authing-gateway
               servicePort: 50250
+    - host: api.procyon.vip
+      http: *http_rules
     - host: api.xpool.top
-      http: *http_rules
-    - host: www.npool.top
-      http: *http_rules
-    - host: www.xpool.top
-      http: *http_rules
-    - host: dashboard.xpool.top
       http: *http_rules
