@@ -19,6 +19,8 @@ func AuthByApp(ctx context.Context, in *npool.AuthByAppRequest) (*npool.AuthByAp
 		return nil, xerrors.Errorf("fail get app: %v", err)
 	}
 
+	// TODO: if app is banned, not allow
+
 	allowed := resp.Info != nil
 
 	return &npool.AuthByAppResponse{
@@ -50,6 +52,8 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 			Allowed: false,
 		}, nil
 	}
+
+	// TODO: if user is banned, not allow
 
 	_, err = grpc2.Logined(ctx, &logingwpb.LoginedRequest{
 		AppID:  in.GetAppID(),
