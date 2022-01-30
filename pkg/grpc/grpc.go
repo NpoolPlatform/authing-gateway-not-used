@@ -36,7 +36,7 @@ func GetApp(ctx context.Context, in *appusermgrpb.GetAppRequest) (*appusermgrpb.
 	return cli.GetApp(ctx, in)
 }
 
-func GetAppUser(ctx context.Context, in *appusermgrpb.GetAppUserRequest) (*appusermgrpb.GetAppUserResponse, error) {
+func GetAppUserInfo(ctx context.Context, in *appusermgrpb.GetAppUserInfoRequest) (*appusermgrpb.GetAppUserInfoResponse, error) {
 	conn, err := grpc2.GetGRPCConn(appusermgrconst.ServiceName, grpc2.GRPCTAG)
 	if err != nil {
 		return nil, xerrors.Errorf("fail get app user connection: %v", err)
@@ -48,7 +48,7 @@ func GetAppUser(ctx context.Context, in *appusermgrpb.GetAppUserRequest) (*appus
 	ctx, cancel := context.WithTimeout(ctx, grpcTimeout)
 	defer cancel()
 
-	return cli.GetAppUser(ctx, in)
+	return cli.GetAppUserInfo(ctx, in)
 }
 
 //---------------------------------------------------------------------------------------------------------------------------

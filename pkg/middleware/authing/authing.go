@@ -41,7 +41,7 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 		}, nil
 	}
 
-	resp1, err := grpc2.GetAppUser(ctx, &appusermgrpb.GetAppUserRequest{
+	resp1, err := grpc2.GetAppUserInfo(ctx, &appusermgrpb.GetAppUserInfoRequest{
 		ID: in.GetUserID(),
 	})
 	if err != nil {
@@ -54,6 +54,11 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 	}
 
 	// TODO: if user is banned, not allow
+	if resp1.Info.Ban != nil {
+		return &npool.AuthByAppRoleUserResponse{
+			Allowed: false,
+		}, nil
+	}
 
 	_, err = grpc2.Logined(ctx, &logingwpb.LoginedRequest{
 		AppID:  in.GetAppID(),
@@ -66,5 +71,7 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 
 	// TODO: check role access authorization to resource
 
-	return nil, nil
+	return &npool.AuthByAppRoleUserResponse{
+		Allowed: true,
+	}, nil
 }
