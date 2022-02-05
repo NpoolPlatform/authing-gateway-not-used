@@ -37,6 +37,7 @@ type AuthHistoryMutation struct {
 	user_id       *uuid.UUID
 	resource      *string
 	method        *string
+	allowed       *bool
 	create_at     *uint32
 	addcreate_at  *int32
 	clearedFields map[string]struct{}
@@ -306,6 +307,42 @@ func (m *AuthHistoryMutation) ResetMethod() {
 	m.method = nil
 }
 
+// SetAllowed sets the "allowed" field.
+func (m *AuthHistoryMutation) SetAllowed(b bool) {
+	m.allowed = &b
+}
+
+// Allowed returns the value of the "allowed" field in the mutation.
+func (m *AuthHistoryMutation) Allowed() (r bool, exists bool) {
+	v := m.allowed
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAllowed returns the old "allowed" field's value of the AuthHistory entity.
+// If the AuthHistory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AuthHistoryMutation) OldAllowed(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAllowed is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAllowed requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAllowed: %w", err)
+	}
+	return oldValue.Allowed, nil
+}
+
+// ResetAllowed resets all changes to the "allowed" field.
+func (m *AuthHistoryMutation) ResetAllowed() {
+	m.allowed = nil
+}
+
 // SetCreateAt sets the "create_at" field.
 func (m *AuthHistoryMutation) SetCreateAt(u uint32) {
 	m.create_at = &u
@@ -381,7 +418,7 @@ func (m *AuthHistoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AuthHistoryMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.app_id != nil {
 		fields = append(fields, authhistory.FieldAppID)
 	}
@@ -393,6 +430,9 @@ func (m *AuthHistoryMutation) Fields() []string {
 	}
 	if m.method != nil {
 		fields = append(fields, authhistory.FieldMethod)
+	}
+	if m.allowed != nil {
+		fields = append(fields, authhistory.FieldAllowed)
 	}
 	if m.create_at != nil {
 		fields = append(fields, authhistory.FieldCreateAt)
@@ -413,6 +453,8 @@ func (m *AuthHistoryMutation) Field(name string) (ent.Value, bool) {
 		return m.Resource()
 	case authhistory.FieldMethod:
 		return m.Method()
+	case authhistory.FieldAllowed:
+		return m.Allowed()
 	case authhistory.FieldCreateAt:
 		return m.CreateAt()
 	}
@@ -432,6 +474,8 @@ func (m *AuthHistoryMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldResource(ctx)
 	case authhistory.FieldMethod:
 		return m.OldMethod(ctx)
+	case authhistory.FieldAllowed:
+		return m.OldAllowed(ctx)
 	case authhistory.FieldCreateAt:
 		return m.OldCreateAt(ctx)
 	}
@@ -470,6 +514,13 @@ func (m *AuthHistoryMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetMethod(v)
+		return nil
+	case authhistory.FieldAllowed:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAllowed(v)
 		return nil
 	case authhistory.FieldCreateAt:
 		v, ok := value.(uint32)
@@ -562,6 +613,9 @@ func (m *AuthHistoryMutation) ResetField(name string) error {
 		return nil
 	case authhistory.FieldMethod:
 		m.ResetMethod()
+		return nil
+	case authhistory.FieldAllowed:
+		m.ResetAllowed()
 		return nil
 	case authhistory.FieldCreateAt:
 		m.ResetCreateAt()

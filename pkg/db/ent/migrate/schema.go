@@ -15,6 +15,7 @@ var (
 		{Name: "user_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "resource", Type: field.TypeString},
 		{Name: "method", Type: field.TypeString},
+		{Name: "allowed", Type: field.TypeBool},
 		{Name: "create_at", Type: field.TypeUint32},
 	}
 	// AuthHistoriesTable holds the schema information for the "auth_histories" table.

@@ -55,6 +55,12 @@ func (ahc *AuthHistoryCreate) SetMethod(s string) *AuthHistoryCreate {
 	return ahc
 }
 
+// SetAllowed sets the "allowed" field.
+func (ahc *AuthHistoryCreate) SetAllowed(b bool) *AuthHistoryCreate {
+	ahc.mutation.SetAllowed(b)
+	return ahc
+}
+
 // SetCreateAt sets the "create_at" field.
 func (ahc *AuthHistoryCreate) SetCreateAt(u uint32) *AuthHistoryCreate {
 	ahc.mutation.SetCreateAt(u)
@@ -175,6 +181,9 @@ func (ahc *AuthHistoryCreate) check() error {
 	if _, ok := ahc.mutation.Method(); !ok {
 		return &ValidationError{Name: "method", err: errors.New(`ent: missing required field "AuthHistory.method"`)}
 	}
+	if _, ok := ahc.mutation.Allowed(); !ok {
+		return &ValidationError{Name: "allowed", err: errors.New(`ent: missing required field "AuthHistory.allowed"`)}
+	}
 	if _, ok := ahc.mutation.CreateAt(); !ok {
 		return &ValidationError{Name: "create_at", err: errors.New(`ent: missing required field "AuthHistory.create_at"`)}
 	}
@@ -246,6 +255,14 @@ func (ahc *AuthHistoryCreate) createSpec() (*AuthHistory, *sqlgraph.CreateSpec) 
 			Column: authhistory.FieldMethod,
 		})
 		_node.Method = value
+	}
+	if value, ok := ahc.mutation.Allowed(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: authhistory.FieldAllowed,
+		})
+		_node.Allowed = value
 	}
 	if value, ok := ahc.mutation.CreateAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -360,6 +377,18 @@ func (u *AuthHistoryUpsert) SetMethod(v string) *AuthHistoryUpsert {
 // UpdateMethod sets the "method" field to the value that was provided on create.
 func (u *AuthHistoryUpsert) UpdateMethod() *AuthHistoryUpsert {
 	u.SetExcluded(authhistory.FieldMethod)
+	return u
+}
+
+// SetAllowed sets the "allowed" field.
+func (u *AuthHistoryUpsert) SetAllowed(v bool) *AuthHistoryUpsert {
+	u.Set(authhistory.FieldAllowed, v)
+	return u
+}
+
+// UpdateAllowed sets the "allowed" field to the value that was provided on create.
+func (u *AuthHistoryUpsert) UpdateAllowed() *AuthHistoryUpsert {
+	u.SetExcluded(authhistory.FieldAllowed)
 	return u
 }
 
@@ -491,6 +520,20 @@ func (u *AuthHistoryUpsertOne) SetMethod(v string) *AuthHistoryUpsertOne {
 func (u *AuthHistoryUpsertOne) UpdateMethod() *AuthHistoryUpsertOne {
 	return u.Update(func(s *AuthHistoryUpsert) {
 		s.UpdateMethod()
+	})
+}
+
+// SetAllowed sets the "allowed" field.
+func (u *AuthHistoryUpsertOne) SetAllowed(v bool) *AuthHistoryUpsertOne {
+	return u.Update(func(s *AuthHistoryUpsert) {
+		s.SetAllowed(v)
+	})
+}
+
+// UpdateAllowed sets the "allowed" field to the value that was provided on create.
+func (u *AuthHistoryUpsertOne) UpdateAllowed() *AuthHistoryUpsertOne {
+	return u.Update(func(s *AuthHistoryUpsert) {
+		s.UpdateAllowed()
 	})
 }
 
@@ -791,6 +834,20 @@ func (u *AuthHistoryUpsertBulk) SetMethod(v string) *AuthHistoryUpsertBulk {
 func (u *AuthHistoryUpsertBulk) UpdateMethod() *AuthHistoryUpsertBulk {
 	return u.Update(func(s *AuthHistoryUpsert) {
 		s.UpdateMethod()
+	})
+}
+
+// SetAllowed sets the "allowed" field.
+func (u *AuthHistoryUpsertBulk) SetAllowed(v bool) *AuthHistoryUpsertBulk {
+	return u.Update(func(s *AuthHistoryUpsert) {
+		s.SetAllowed(v)
+	})
+}
+
+// UpdateAllowed sets the "allowed" field to the value that was provided on create.
+func (u *AuthHistoryUpsertBulk) UpdateAllowed() *AuthHistoryUpsertBulk {
+	return u.Update(func(s *AuthHistoryUpsert) {
+		s.UpdateAllowed()
 	})
 }
 

@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 
+	crud "github.com/NpoolPlatform/authing-gateway/pkg/crud/authhistory"
 	mw "github.com/NpoolPlatform/authing-gateway/pkg/middleware/authing"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool/authinggateway"
@@ -25,6 +26,15 @@ func (s *Server) AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleU
 	if err != nil {
 		logger.Sugar().Errorf("fail auth by app role user: %v", err)
 		return &npool.AuthByAppRoleUserResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return resp, nil
+}
+
+func (s *Server) GetAuthHistories(ctx context.Context, in *npool.GetAuthHistoriesRequest) (*npool.GetAuthHistoriesResponse, error) {
+	resp, err := crud.GetByAppUser(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorf("fail get auth histories by app user: %v", err)
+		return &npool.GetAuthHistoriesResponse{}, status.Error(codes.Internal, err.Error())
 	}
 	return resp, nil
 }

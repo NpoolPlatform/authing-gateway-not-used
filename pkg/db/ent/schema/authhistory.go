@@ -24,6 +24,7 @@ func (AuthHistory) Fields() []ent.Field {
 		field.UUID("user_id", uuid.UUID{}).Optional(),
 		field.String("resource"),
 		field.String("method"),
+		field.Bool("allowed"),
 		field.Uint32("create_at").
 			DefaultFunc(func() uint32 {
 				return uint32(time.Now().Unix())

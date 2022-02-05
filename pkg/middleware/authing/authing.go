@@ -3,15 +3,33 @@ package authing
 import (
 	"context"
 
+	crud "github.com/NpoolPlatform/authing-gateway/pkg/crud/authhistory"
 	grpc2 "github.com/NpoolPlatform/authing-gateway/pkg/grpc"
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
 	npool "github.com/NpoolPlatform/message/npool/authinggateway"
 	logingwpb "github.com/NpoolPlatform/message/npool/logingateway"
 
+	"github.com/google/uuid"
 	"golang.org/x/xerrors"
 )
 
 func AuthByApp(ctx context.Context, in *npool.AuthByAppRequest) (*npool.AuthByAppResponse, error) {
+	allowed := false
+
+	defer func() {
+		err := crud.Create(ctx, &npool.AuthHistory{
+			AppID:    in.GetAppID(),
+			UserID:   uuid.UUID{}.String(),
+			Resource: in.GetResource(),
+			Method:   in.GetMethod(),
+			Allowed:  allowed,
+		})
+		if err != nil {
+			logger.Sugar().Errorf("fail create auth history: %v", err)
+		}
+	}()
+
 	resp, err := grpc2.GetApp(ctx, &appusermgrpb.GetAppRequest{
 		ID: in.GetAppID(),
 	})
@@ -21,7 +39,7 @@ func AuthByApp(ctx context.Context, in *npool.AuthByAppRequest) (*npool.AuthByAp
 
 	// TODO: if app is banned, not allow
 
-	allowed := resp.Info != nil
+	allowed = resp.Info != nil
 
 	return &npool.AuthByAppResponse{
 		Allowed: allowed,
@@ -29,6 +47,21 @@ func AuthByApp(ctx context.Context, in *npool.AuthByAppRequest) (*npool.AuthByAp
 }
 
 func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) (*npool.AuthByAppRoleUserResponse, error) {
+	allowed := false
+
+	defer func() {
+		err := crud.Create(ctx, &npool.AuthHistory{
+			AppID:    in.GetAppID(),
+			UserID:   in.GetUserID(),
+			Resource: in.GetResource(),
+			Method:   in.GetMethod(),
+			Allowed:  allowed,
+		})
+		if err != nil {
+			logger.Sugar().Errorf("fail create auth history: %v", err)
+		}
+	}()
+
 	resp, err := AuthByApp(ctx, &npool.AuthByAppRequest{
 		AppID: in.GetAppID(),
 	})
@@ -70,6 +103,8 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 	}
 
 	// TODO: check role access authorization to resource
+
+	allowed = true
 
 	return &npool.AuthByAppRoleUserResponse{
 		Allowed: true,

@@ -66,6 +66,12 @@ func (ahu *AuthHistoryUpdate) SetMethod(s string) *AuthHistoryUpdate {
 	return ahu
 }
 
+// SetAllowed sets the "allowed" field.
+func (ahu *AuthHistoryUpdate) SetAllowed(b bool) *AuthHistoryUpdate {
+	ahu.mutation.SetAllowed(b)
+	return ahu
+}
+
 // SetCreateAt sets the "create_at" field.
 func (ahu *AuthHistoryUpdate) SetCreateAt(u uint32) *AuthHistoryUpdate {
 	ahu.mutation.ResetCreateAt()
@@ -198,6 +204,13 @@ func (ahu *AuthHistoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: authhistory.FieldMethod,
 		})
 	}
+	if value, ok := ahu.mutation.Allowed(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: authhistory.FieldAllowed,
+		})
+	}
 	if value, ok := ahu.mutation.CreateAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeUint32,
@@ -266,6 +279,12 @@ func (ahuo *AuthHistoryUpdateOne) SetResource(s string) *AuthHistoryUpdateOne {
 // SetMethod sets the "method" field.
 func (ahuo *AuthHistoryUpdateOne) SetMethod(s string) *AuthHistoryUpdateOne {
 	ahuo.mutation.SetMethod(s)
+	return ahuo
+}
+
+// SetAllowed sets the "allowed" field.
+func (ahuo *AuthHistoryUpdateOne) SetAllowed(b bool) *AuthHistoryUpdateOne {
+	ahuo.mutation.SetAllowed(b)
 	return ahuo
 }
 
@@ -423,6 +442,13 @@ func (ahuo *AuthHistoryUpdateOne) sqlSave(ctx context.Context) (_node *AuthHisto
 			Type:   field.TypeString,
 			Value:  value,
 			Column: authhistory.FieldMethod,
+		})
+	}
+	if value, ok := ahuo.mutation.Allowed(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: authhistory.FieldAllowed,
 		})
 	}
 	if value, ok := ahuo.mutation.CreateAt(); ok {

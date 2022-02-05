@@ -19,6 +19,8 @@ const (
 	FieldResource = "resource"
 	// FieldMethod holds the string denoting the method field in the database.
 	FieldMethod = "method"
+	// FieldAllowed holds the string denoting the allowed field in the database.
+	FieldAllowed = "allowed"
 	// FieldCreateAt holds the string denoting the create_at field in the database.
 	FieldCreateAt = "create_at"
 	// Table holds the table name of the authhistory in the database.
@@ -32,6 +34,7 @@ var Columns = []string{
 	FieldUserID,
 	FieldResource,
 	FieldMethod,
+	FieldAllowed,
 	FieldCreateAt,
 }
 

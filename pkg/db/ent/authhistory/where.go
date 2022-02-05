@@ -119,6 +119,13 @@ func Method(v string) predicate.AuthHistory {
 	})
 }
 
+// Allowed applies equality check predicate on the "allowed" field. It's identical to AllowedEQ.
+func Allowed(v bool) predicate.AuthHistory {
+	return predicate.AuthHistory(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldAllowed), v))
+	})
+}
+
 // CreateAt applies equality check predicate on the "create_at" field. It's identical to CreateAtEQ.
 func CreateAt(v uint32) predicate.AuthHistory {
 	return predicate.AuthHistory(func(s *sql.Selector) {
@@ -511,6 +518,20 @@ func MethodEqualFold(v string) predicate.AuthHistory {
 func MethodContainsFold(v string) predicate.AuthHistory {
 	return predicate.AuthHistory(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldMethod), v))
+	})
+}
+
+// AllowedEQ applies the EQ predicate on the "allowed" field.
+func AllowedEQ(v bool) predicate.AuthHistory {
+	return predicate.AuthHistory(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldAllowed), v))
+	})
+}
+
+// AllowedNEQ applies the NEQ predicate on the "allowed" field.
+func AllowedNEQ(v bool) predicate.AuthHistory {
+	return predicate.AuthHistory(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldAllowed), v))
 	})
 }
 

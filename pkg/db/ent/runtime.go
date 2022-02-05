@@ -15,7 +15,7 @@ func init() {
 	authhistoryFields := schema.AuthHistory{}.Fields()
 	_ = authhistoryFields
 	// authhistoryDescCreateAt is the schema descriptor for create_at field.
-	authhistoryDescCreateAt := authhistoryFields[5].Descriptor()
+	authhistoryDescCreateAt := authhistoryFields[6].Descriptor()
 	// authhistory.DefaultCreateAt holds the default value on creation for the create_at field.
 	authhistory.DefaultCreateAt = authhistoryDescCreateAt.Default.(func() uint32)
 	// authhistoryDescID is the schema descriptor for id field.

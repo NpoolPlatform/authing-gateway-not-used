@@ -24,6 +24,8 @@ type AuthHistory struct {
 	Resource string `json:"resource,omitempty"`
 	// Method holds the value of the "method" field.
 	Method string `json:"method,omitempty"`
+	// Allowed holds the value of the "allowed" field.
+	Allowed bool `json:"allowed,omitempty"`
 	// CreateAt holds the value of the "create_at" field.
 	CreateAt uint32 `json:"create_at,omitempty"`
 }
@@ -33,6 +35,8 @@ func (*AuthHistory) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case authhistory.FieldAllowed:
+			values[i] = new(sql.NullBool)
 		case authhistory.FieldCreateAt:
 			values[i] = new(sql.NullInt64)
 		case authhistory.FieldResource, authhistory.FieldMethod:
@@ -84,6 +88,12 @@ func (ah *AuthHistory) assignValues(columns []string, values []interface{}) erro
 			} else if value.Valid {
 				ah.Method = value.String
 			}
+		case authhistory.FieldAllowed:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field allowed", values[i])
+			} else if value.Valid {
+				ah.Allowed = value.Bool
+			}
 		case authhistory.FieldCreateAt:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field create_at", values[i])
@@ -126,6 +136,8 @@ func (ah *AuthHistory) String() string {
 	builder.WriteString(ah.Resource)
 	builder.WriteString(", method=")
 	builder.WriteString(ah.Method)
+	builder.WriteString(", allowed=")
+	builder.WriteString(fmt.Sprintf("%v", ah.Allowed))
 	builder.WriteString(", create_at=")
 	builder.WriteString(fmt.Sprintf("%v", ah.CreateAt))
 	builder.WriteByte(')')
