@@ -93,13 +93,16 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 		}, nil
 	}
 
-	_, err = grpc2.Logined(ctx, &logingwpb.LoginedRequest{
+	resp2, err := grpc2.Logined(ctx, &logingwpb.LoginedRequest{
 		AppID:  in.GetAppID(),
 		UserID: in.GetUserID(),
 		Token:  in.GetToken(),
 	})
 	if err != nil {
 		return nil, xerrors.Errorf("user not login: %v", err)
+	}
+	if resp2.Info == nil {
+		return nil, xerrors.Errorf("user not login")
 	}
 
 	// TODO: check role access authorization to resource
