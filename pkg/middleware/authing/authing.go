@@ -128,7 +128,6 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 		}, nil
 	}
 
-	// TODO: if user is banned, not allow
 	if resp1.Info.Ban != nil {
 		return &npool.AuthByAppRoleUserResponse{
 			Allowed: false,
