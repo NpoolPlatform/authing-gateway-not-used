@@ -10,6 +10,9 @@ import (
 	"github.com/NpoolPlatform/authing-gateway/pkg/db/ent/migrate"
 	"github.com/google/uuid"
 
+	"github.com/NpoolPlatform/authing-gateway/pkg/db/ent/appauth"
+	"github.com/NpoolPlatform/authing-gateway/pkg/db/ent/approleauth"
+	"github.com/NpoolPlatform/authing-gateway/pkg/db/ent/appuserauth"
 	"github.com/NpoolPlatform/authing-gateway/pkg/db/ent/authhistory"
 
 	"entgo.io/ent/dialect"
@@ -21,6 +24,12 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// AppAuth is the client for interacting with the AppAuth builders.
+	AppAuth *AppAuthClient
+	// AppRoleAuth is the client for interacting with the AppRoleAuth builders.
+	AppRoleAuth *AppRoleAuthClient
+	// AppUserAuth is the client for interacting with the AppUserAuth builders.
+	AppUserAuth *AppUserAuthClient
 	// AuthHistory is the client for interacting with the AuthHistory builders.
 	AuthHistory *AuthHistoryClient
 }
@@ -36,6 +45,9 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.AppAuth = NewAppAuthClient(c.config)
+	c.AppRoleAuth = NewAppRoleAuthClient(c.config)
+	c.AppUserAuth = NewAppUserAuthClient(c.config)
 	c.AuthHistory = NewAuthHistoryClient(c.config)
 }
 
@@ -70,6 +82,9 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:         ctx,
 		config:      cfg,
+		AppAuth:     NewAppAuthClient(cfg),
+		AppRoleAuth: NewAppRoleAuthClient(cfg),
+		AppUserAuth: NewAppUserAuthClient(cfg),
 		AuthHistory: NewAuthHistoryClient(cfg),
 	}, nil
 }
@@ -90,6 +105,9 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:         ctx,
 		config:      cfg,
+		AppAuth:     NewAppAuthClient(cfg),
+		AppRoleAuth: NewAppRoleAuthClient(cfg),
+		AppUserAuth: NewAppUserAuthClient(cfg),
 		AuthHistory: NewAuthHistoryClient(cfg),
 	}, nil
 }
@@ -97,7 +115,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		AuthHistory.
+//		AppAuth.
 //		Query().
 //		Count(ctx)
 //
@@ -120,7 +138,280 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.AppAuth.Use(hooks...)
+	c.AppRoleAuth.Use(hooks...)
+	c.AppUserAuth.Use(hooks...)
 	c.AuthHistory.Use(hooks...)
+}
+
+// AppAuthClient is a client for the AppAuth schema.
+type AppAuthClient struct {
+	config
+}
+
+// NewAppAuthClient returns a client for the AppAuth from the given config.
+func NewAppAuthClient(c config) *AppAuthClient {
+	return &AppAuthClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `appauth.Hooks(f(g(h())))`.
+func (c *AppAuthClient) Use(hooks ...Hook) {
+	c.hooks.AppAuth = append(c.hooks.AppAuth, hooks...)
+}
+
+// Create returns a create builder for AppAuth.
+func (c *AppAuthClient) Create() *AppAuthCreate {
+	mutation := newAppAuthMutation(c.config, OpCreate)
+	return &AppAuthCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AppAuth entities.
+func (c *AppAuthClient) CreateBulk(builders ...*AppAuthCreate) *AppAuthCreateBulk {
+	return &AppAuthCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AppAuth.
+func (c *AppAuthClient) Update() *AppAuthUpdate {
+	mutation := newAppAuthMutation(c.config, OpUpdate)
+	return &AppAuthUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AppAuthClient) UpdateOne(aa *AppAuth) *AppAuthUpdateOne {
+	mutation := newAppAuthMutation(c.config, OpUpdateOne, withAppAuth(aa))
+	return &AppAuthUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AppAuthClient) UpdateOneID(id uuid.UUID) *AppAuthUpdateOne {
+	mutation := newAppAuthMutation(c.config, OpUpdateOne, withAppAuthID(id))
+	return &AppAuthUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AppAuth.
+func (c *AppAuthClient) Delete() *AppAuthDelete {
+	mutation := newAppAuthMutation(c.config, OpDelete)
+	return &AppAuthDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *AppAuthClient) DeleteOne(aa *AppAuth) *AppAuthDeleteOne {
+	return c.DeleteOneID(aa.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *AppAuthClient) DeleteOneID(id uuid.UUID) *AppAuthDeleteOne {
+	builder := c.Delete().Where(appauth.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AppAuthDeleteOne{builder}
+}
+
+// Query returns a query builder for AppAuth.
+func (c *AppAuthClient) Query() *AppAuthQuery {
+	return &AppAuthQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a AppAuth entity by its id.
+func (c *AppAuthClient) Get(ctx context.Context, id uuid.UUID) (*AppAuth, error) {
+	return c.Query().Where(appauth.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AppAuthClient) GetX(ctx context.Context, id uuid.UUID) *AppAuth {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AppAuthClient) Hooks() []Hook {
+	return c.hooks.AppAuth
+}
+
+// AppRoleAuthClient is a client for the AppRoleAuth schema.
+type AppRoleAuthClient struct {
+	config
+}
+
+// NewAppRoleAuthClient returns a client for the AppRoleAuth from the given config.
+func NewAppRoleAuthClient(c config) *AppRoleAuthClient {
+	return &AppRoleAuthClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `approleauth.Hooks(f(g(h())))`.
+func (c *AppRoleAuthClient) Use(hooks ...Hook) {
+	c.hooks.AppRoleAuth = append(c.hooks.AppRoleAuth, hooks...)
+}
+
+// Create returns a create builder for AppRoleAuth.
+func (c *AppRoleAuthClient) Create() *AppRoleAuthCreate {
+	mutation := newAppRoleAuthMutation(c.config, OpCreate)
+	return &AppRoleAuthCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AppRoleAuth entities.
+func (c *AppRoleAuthClient) CreateBulk(builders ...*AppRoleAuthCreate) *AppRoleAuthCreateBulk {
+	return &AppRoleAuthCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AppRoleAuth.
+func (c *AppRoleAuthClient) Update() *AppRoleAuthUpdate {
+	mutation := newAppRoleAuthMutation(c.config, OpUpdate)
+	return &AppRoleAuthUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AppRoleAuthClient) UpdateOne(ara *AppRoleAuth) *AppRoleAuthUpdateOne {
+	mutation := newAppRoleAuthMutation(c.config, OpUpdateOne, withAppRoleAuth(ara))
+	return &AppRoleAuthUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AppRoleAuthClient) UpdateOneID(id uuid.UUID) *AppRoleAuthUpdateOne {
+	mutation := newAppRoleAuthMutation(c.config, OpUpdateOne, withAppRoleAuthID(id))
+	return &AppRoleAuthUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AppRoleAuth.
+func (c *AppRoleAuthClient) Delete() *AppRoleAuthDelete {
+	mutation := newAppRoleAuthMutation(c.config, OpDelete)
+	return &AppRoleAuthDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *AppRoleAuthClient) DeleteOne(ara *AppRoleAuth) *AppRoleAuthDeleteOne {
+	return c.DeleteOneID(ara.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *AppRoleAuthClient) DeleteOneID(id uuid.UUID) *AppRoleAuthDeleteOne {
+	builder := c.Delete().Where(approleauth.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AppRoleAuthDeleteOne{builder}
+}
+
+// Query returns a query builder for AppRoleAuth.
+func (c *AppRoleAuthClient) Query() *AppRoleAuthQuery {
+	return &AppRoleAuthQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a AppRoleAuth entity by its id.
+func (c *AppRoleAuthClient) Get(ctx context.Context, id uuid.UUID) (*AppRoleAuth, error) {
+	return c.Query().Where(approleauth.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AppRoleAuthClient) GetX(ctx context.Context, id uuid.UUID) *AppRoleAuth {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AppRoleAuthClient) Hooks() []Hook {
+	return c.hooks.AppRoleAuth
+}
+
+// AppUserAuthClient is a client for the AppUserAuth schema.
+type AppUserAuthClient struct {
+	config
+}
+
+// NewAppUserAuthClient returns a client for the AppUserAuth from the given config.
+func NewAppUserAuthClient(c config) *AppUserAuthClient {
+	return &AppUserAuthClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `appuserauth.Hooks(f(g(h())))`.
+func (c *AppUserAuthClient) Use(hooks ...Hook) {
+	c.hooks.AppUserAuth = append(c.hooks.AppUserAuth, hooks...)
+}
+
+// Create returns a create builder for AppUserAuth.
+func (c *AppUserAuthClient) Create() *AppUserAuthCreate {
+	mutation := newAppUserAuthMutation(c.config, OpCreate)
+	return &AppUserAuthCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AppUserAuth entities.
+func (c *AppUserAuthClient) CreateBulk(builders ...*AppUserAuthCreate) *AppUserAuthCreateBulk {
+	return &AppUserAuthCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AppUserAuth.
+func (c *AppUserAuthClient) Update() *AppUserAuthUpdate {
+	mutation := newAppUserAuthMutation(c.config, OpUpdate)
+	return &AppUserAuthUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AppUserAuthClient) UpdateOne(aua *AppUserAuth) *AppUserAuthUpdateOne {
+	mutation := newAppUserAuthMutation(c.config, OpUpdateOne, withAppUserAuth(aua))
+	return &AppUserAuthUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AppUserAuthClient) UpdateOneID(id uuid.UUID) *AppUserAuthUpdateOne {
+	mutation := newAppUserAuthMutation(c.config, OpUpdateOne, withAppUserAuthID(id))
+	return &AppUserAuthUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AppUserAuth.
+func (c *AppUserAuthClient) Delete() *AppUserAuthDelete {
+	mutation := newAppUserAuthMutation(c.config, OpDelete)
+	return &AppUserAuthDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *AppUserAuthClient) DeleteOne(aua *AppUserAuth) *AppUserAuthDeleteOne {
+	return c.DeleteOneID(aua.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *AppUserAuthClient) DeleteOneID(id uuid.UUID) *AppUserAuthDeleteOne {
+	builder := c.Delete().Where(appuserauth.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AppUserAuthDeleteOne{builder}
+}
+
+// Query returns a query builder for AppUserAuth.
+func (c *AppUserAuthClient) Query() *AppUserAuthQuery {
+	return &AppUserAuthQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a AppUserAuth entity by its id.
+func (c *AppUserAuthClient) Get(ctx context.Context, id uuid.UUID) (*AppUserAuth, error) {
+	return c.Query().Where(appuserauth.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AppUserAuthClient) GetX(ctx context.Context, id uuid.UUID) *AppUserAuth {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AppUserAuthClient) Hooks() []Hook {
+	return c.hooks.AppUserAuth
 }
 
 // AuthHistoryClient is a client for the AuthHistory schema.

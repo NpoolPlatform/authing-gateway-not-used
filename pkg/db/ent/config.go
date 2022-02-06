@@ -24,6 +24,9 @@ type config struct {
 
 // hooks per client, for fast access.
 type hooks struct {
+	AppAuth     []ent.Hook
+	AppRoleAuth []ent.Hook
+	AppUserAuth []ent.Hook
 	AuthHistory []ent.Hook
 }
 

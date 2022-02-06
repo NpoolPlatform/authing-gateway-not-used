@@ -12,6 +12,12 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// AppAuth is the client for interacting with the AppAuth builders.
+	AppAuth *AppAuthClient
+	// AppRoleAuth is the client for interacting with the AppRoleAuth builders.
+	AppRoleAuth *AppRoleAuthClient
+	// AppUserAuth is the client for interacting with the AppUserAuth builders.
+	AppUserAuth *AppUserAuthClient
 	// AuthHistory is the client for interacting with the AuthHistory builders.
 	AuthHistory *AuthHistoryClient
 
@@ -149,6 +155,9 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.AppAuth = NewAppAuthClient(tx.config)
+	tx.AppRoleAuth = NewAppRoleAuthClient(tx.config)
+	tx.AppUserAuth = NewAppUserAuthClient(tx.config)
 	tx.AuthHistory = NewAuthHistoryClient(tx.config)
 }
 
@@ -159,7 +168,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: AuthHistory.QueryXXX(), the query will be executed
+// applies a query, for example: AppAuth.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

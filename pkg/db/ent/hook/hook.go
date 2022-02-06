@@ -9,6 +9,45 @@ import (
 	"github.com/NpoolPlatform/authing-gateway/pkg/db/ent"
 )
 
+// The AppAuthFunc type is an adapter to allow the use of ordinary
+// function as AppAuth mutator.
+type AppAuthFunc func(context.Context, *ent.AppAuthMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AppAuthFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.AppAuthMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AppAuthMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The AppRoleAuthFunc type is an adapter to allow the use of ordinary
+// function as AppRoleAuth mutator.
+type AppRoleAuthFunc func(context.Context, *ent.AppRoleAuthMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AppRoleAuthFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.AppRoleAuthMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AppRoleAuthMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The AppUserAuthFunc type is an adapter to allow the use of ordinary
+// function as AppUserAuth mutator.
+type AppUserAuthFunc func(context.Context, *ent.AppUserAuthMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AppUserAuthFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.AppUserAuthMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AppUserAuthMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The AuthHistoryFunc type is an adapter to allow the use of ordinary
 // function as AuthHistory mutator.
 type AuthHistoryFunc func(context.Context, *ent.AuthHistoryMutation) (ent.Value, error)

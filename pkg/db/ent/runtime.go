@@ -3,6 +3,9 @@
 package ent
 
 import (
+	"github.com/NpoolPlatform/authing-gateway/pkg/db/ent/appauth"
+	"github.com/NpoolPlatform/authing-gateway/pkg/db/ent/approleauth"
+	"github.com/NpoolPlatform/authing-gateway/pkg/db/ent/appuserauth"
 	"github.com/NpoolPlatform/authing-gateway/pkg/db/ent/authhistory"
 	"github.com/NpoolPlatform/authing-gateway/pkg/db/ent/schema"
 	"github.com/google/uuid"
@@ -12,6 +15,66 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	appauthFields := schema.AppAuth{}.Fields()
+	_ = appauthFields
+	// appauthDescCreateAt is the schema descriptor for create_at field.
+	appauthDescCreateAt := appauthFields[4].Descriptor()
+	// appauth.DefaultCreateAt holds the default value on creation for the create_at field.
+	appauth.DefaultCreateAt = appauthDescCreateAt.Default.(func() uint32)
+	// appauthDescUpdateAt is the schema descriptor for update_at field.
+	appauthDescUpdateAt := appauthFields[5].Descriptor()
+	// appauth.DefaultUpdateAt holds the default value on creation for the update_at field.
+	appauth.DefaultUpdateAt = appauthDescUpdateAt.Default.(func() uint32)
+	// appauth.UpdateDefaultUpdateAt holds the default value on update for the update_at field.
+	appauth.UpdateDefaultUpdateAt = appauthDescUpdateAt.UpdateDefault.(func() uint32)
+	// appauthDescDeleteAt is the schema descriptor for delete_at field.
+	appauthDescDeleteAt := appauthFields[6].Descriptor()
+	// appauth.DefaultDeleteAt holds the default value on creation for the delete_at field.
+	appauth.DefaultDeleteAt = appauthDescDeleteAt.Default.(func() uint32)
+	// appauthDescID is the schema descriptor for id field.
+	appauthDescID := appauthFields[0].Descriptor()
+	// appauth.DefaultID holds the default value on creation for the id field.
+	appauth.DefaultID = appauthDescID.Default.(func() uuid.UUID)
+	approleauthFields := schema.AppRoleAuth{}.Fields()
+	_ = approleauthFields
+	// approleauthDescCreateAt is the schema descriptor for create_at field.
+	approleauthDescCreateAt := approleauthFields[5].Descriptor()
+	// approleauth.DefaultCreateAt holds the default value on creation for the create_at field.
+	approleauth.DefaultCreateAt = approleauthDescCreateAt.Default.(func() uint32)
+	// approleauthDescUpdateAt is the schema descriptor for update_at field.
+	approleauthDescUpdateAt := approleauthFields[6].Descriptor()
+	// approleauth.DefaultUpdateAt holds the default value on creation for the update_at field.
+	approleauth.DefaultUpdateAt = approleauthDescUpdateAt.Default.(func() uint32)
+	// approleauth.UpdateDefaultUpdateAt holds the default value on update for the update_at field.
+	approleauth.UpdateDefaultUpdateAt = approleauthDescUpdateAt.UpdateDefault.(func() uint32)
+	// approleauthDescDeleteAt is the schema descriptor for delete_at field.
+	approleauthDescDeleteAt := approleauthFields[7].Descriptor()
+	// approleauth.DefaultDeleteAt holds the default value on creation for the delete_at field.
+	approleauth.DefaultDeleteAt = approleauthDescDeleteAt.Default.(func() uint32)
+	// approleauthDescID is the schema descriptor for id field.
+	approleauthDescID := approleauthFields[0].Descriptor()
+	// approleauth.DefaultID holds the default value on creation for the id field.
+	approleauth.DefaultID = approleauthDescID.Default.(func() uuid.UUID)
+	appuserauthFields := schema.AppUserAuth{}.Fields()
+	_ = appuserauthFields
+	// appuserauthDescCreateAt is the schema descriptor for create_at field.
+	appuserauthDescCreateAt := appuserauthFields[5].Descriptor()
+	// appuserauth.DefaultCreateAt holds the default value on creation for the create_at field.
+	appuserauth.DefaultCreateAt = appuserauthDescCreateAt.Default.(func() uint32)
+	// appuserauthDescUpdateAt is the schema descriptor for update_at field.
+	appuserauthDescUpdateAt := appuserauthFields[6].Descriptor()
+	// appuserauth.DefaultUpdateAt holds the default value on creation for the update_at field.
+	appuserauth.DefaultUpdateAt = appuserauthDescUpdateAt.Default.(func() uint32)
+	// appuserauth.UpdateDefaultUpdateAt holds the default value on update for the update_at field.
+	appuserauth.UpdateDefaultUpdateAt = appuserauthDescUpdateAt.UpdateDefault.(func() uint32)
+	// appuserauthDescDeleteAt is the schema descriptor for delete_at field.
+	appuserauthDescDeleteAt := appuserauthFields[7].Descriptor()
+	// appuserauth.DefaultDeleteAt holds the default value on creation for the delete_at field.
+	appuserauth.DefaultDeleteAt = appuserauthDescDeleteAt.Default.(func() uint32)
+	// appuserauthDescID is the schema descriptor for id field.
+	appuserauthDescID := appuserauthFields[0].Descriptor()
+	// appuserauth.DefaultID holds the default value on creation for the id field.
+	appuserauth.DefaultID = appuserauthDescID.Default.(func() uuid.UUID)
 	authhistoryFields := schema.AuthHistory{}.Fields()
 	_ = authhistoryFields
 	// authhistoryDescCreateAt is the schema descriptor for create_at field.

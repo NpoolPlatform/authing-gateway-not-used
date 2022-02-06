@@ -8,6 +8,9 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/NpoolPlatform/authing-gateway/pkg/db/ent/appauth"
+	"github.com/NpoolPlatform/authing-gateway/pkg/db/ent/approleauth"
+	"github.com/NpoolPlatform/authing-gateway/pkg/db/ent/appuserauth"
 	"github.com/NpoolPlatform/authing-gateway/pkg/db/ent/authhistory"
 )
 
@@ -29,6 +32,9 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
+		appauth.Table:     appauth.ValidColumn,
+		approleauth.Table: approleauth.ValidColumn,
+		appuserauth.Table: appuserauth.ValidColumn,
 		authhistory.Table: authhistory.ValidColumn,
 	}
 	check, ok := checks[table]
