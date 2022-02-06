@@ -60,3 +60,83 @@ func (s *Server) GetAuthHistoriesByOtherApp(ctx context.Context, in *npool.GetAu
 		Infos: resp.Infos,
 	}, nil
 }
+
+func (s *Server) CreateAppAuthForOtherApp(ctx context.Context, in *npool.CreateAppAuthForOtherAppRequest) (*npool.CreateAppAuthForOtherAppResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) GetAppAuthByAppResourceMethod(ctx context.Context, in *npool.GetAppAuthByAppResourceMethodRequest) (*npool.GetAppAuthByAppResourceMethodResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) GetAppAuthByOtherAppResourceMethod(ctx context.Context, in *npool.GetAppAuthByOtherAppResourceMethodRequest) (*npool.GetAppAuthByOtherAppResourceMethodResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) DeleteAppAuth(ctx context.Context, in *npool.DeleteAppAuthRequest) (*npool.DeleteAppAuthResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) CreateAppRoleAuth(ctx context.Context, in *npool.CreateAppRoleAuthRequest) (*npool.CreateAppRoleAuthResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) CreateAppRoleAuthForOtherApp(ctx context.Context, in *npool.CreateAppRoleAuthForOtherAppRequest) (*npool.CreateAppRoleAuthForOtherAppResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) GetAppAuthByAppRoleResourceMethod(ctx context.Context, in *npool.GetAppAuthByAppRoleResourceMethodRequest) (*npool.GetAppAuthByAppRoleResourceMethodResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) GetAppAuthByOtherAppRoleResourceMethod(ctx context.Context, in *npool.GetAppAuthByOtherAppRoleResourceMethodRequest) (*npool.GetAppAuthByOtherAppRoleResourceMethodResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) DeleteAppRoleAuth(ctx context.Context, in *npool.DeleteAppRoleAuthRequest) (*npool.DeleteAppRoleAuthResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) CreateAppUserAuth(ctx context.Context, in *npool.CreateAppUserAuthRequest) (*npool.CreateAppUserAuthResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) CreateAppUserAuthForOtherApp(ctx context.Context, in *npool.CreateAppUserAuthForOtherAppRequest) (*npool.CreateAppUserAuthForOtherAppResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) GetAppAuthByAppUserResourceMethod(ctx context.Context, in *npool.GetAppAuthByAppUserResourceMethodRequest) (*npool.GetAppAuthByAppUserResourceMethodResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) GetAppAuthByOtherAppUserResourceMethod(ctx context.Context, in *npool.GetAppAuthByOtherAppUserResourceMethodRequest) (*npool.GetAppAuthByOtherAppUserResourceMethodResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) DeleteAppUserAuth(ctx context.Context, in *npool.DeleteAppUserAuthRequest) (*npool.DeleteAppUserAuthResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) GetAuthsByApp(ctx context.Context, in *npool.GetAuthsByAppRequest) (*npool.GetAuthsByAppResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) GetAuthsByOtherApp(ctx context.Context, in *npool.GetAuthsByOtherAppRequest) (*npool.GetAuthsByOtherAppResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) GetAuthsByAppRole(ctx context.Context, in *npool.GetAuthsByAppRoleRequest) (*npool.GetAuthsByAppRoleResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) GetAuthsByOtherAppRole(ctx context.Context, in *npool.GetAuthsByOtherAppRoleRequest) (*npool.GetAuthsByOtherAppRoleResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) GetAuthsByAppUser(ctx context.Context, in *npool.GetAuthsByAppUserRequest) (*npool.GetAuthsByAppUserResponse, error) {
+	return nil, nil
+}
+
+func (s *Server) GetAuthsByOtherAppUser(ctx context.Context, in *npool.GetAuthsByOtherAppUserRequest) (*npool.GetAuthsByOtherAppUserResponse, error) {
+	return nil, nil
+}

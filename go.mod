@@ -8,7 +8,7 @@ require (
 	github.com/NpoolPlatform/appuser-manager v0.0.0-20220126160509-d91593fa9fa2
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20220127085959-4940540d8042
 	github.com/NpoolPlatform/login-gateway v0.0.0-20220127094538-a90390aa0e0e
-	github.com/NpoolPlatform/message v0.0.0-20220206034609-30056bfe7438
+	github.com/NpoolPlatform/message v0.0.0-20220206104440-1a30ffa838c4
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.2
