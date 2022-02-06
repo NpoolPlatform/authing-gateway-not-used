@@ -22,9 +22,9 @@ func (AppRoleAuth) Fields() []ent.Field {
 			Default(uuid.New).
 			Unique(),
 		field.UUID("app_id", uuid.UUID{}),
-		field.UUID("role_id", uuid.UUID{}),
 		field.String("resource"),
 		field.String("method"),
+		field.UUID("role_id", uuid.UUID{}),
 		field.Uint32("create_at").
 			DefaultFunc(func() uint32 {
 				return uint32(time.Now().Unix())
