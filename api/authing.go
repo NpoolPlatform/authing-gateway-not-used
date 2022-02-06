@@ -76,15 +76,36 @@ func (s *Server) CreateAppAuthForOtherApp(ctx context.Context, in *npool.CreateA
 }
 
 func (s *Server) GetAppAuthByAppResourceMethod(ctx context.Context, in *npool.GetAppAuthByAppResourceMethodRequest) (*npool.GetAppAuthByAppResourceMethodResponse, error) {
-	return nil, nil
+	resp, err := appauthcrud.GetAppAuthByAppResourceMethod(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorf("fail get app auth by app resource method: %v", err)
+		return &npool.GetAppAuthByAppResourceMethodResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return resp, nil
 }
 
 func (s *Server) GetAppAuthByOtherAppResourceMethod(ctx context.Context, in *npool.GetAppAuthByOtherAppResourceMethodRequest) (*npool.GetAppAuthByOtherAppResourceMethodResponse, error) {
-	return nil, nil
+	resp, err := appauthcrud.GetAppAuthByAppResourceMethod(ctx, &npool.GetAppAuthByAppResourceMethodRequest{
+		AppID:    in.GetTargetAppID(),
+		Resource: in.GetResource(),
+		Method:   in.GetMethod(),
+	})
+	if err != nil {
+		logger.Sugar().Errorf("fail get app auth by other app resource method: %v", err)
+		return &npool.GetAppAuthByOtherAppResourceMethodResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return &npool.GetAppAuthByOtherAppResourceMethodResponse{
+		Info: resp.Info,
+	}, nil
 }
 
 func (s *Server) DeleteAppAuth(ctx context.Context, in *npool.DeleteAppAuthRequest) (*npool.DeleteAppAuthResponse, error) {
-	return nil, nil
+	resp, err := appauthcrud.Delete(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorf("fail delelp auth: %v", err)
+		return &npool.DeleteAppAuthResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return resp, nil
 }
 
 func (s *Server) CreateAppRoleAuth(ctx context.Context, in *npool.CreateAppRoleAuthRequest) (*npool.CreateAppRoleAuthResponse, error) {
