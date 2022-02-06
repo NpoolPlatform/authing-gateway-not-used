@@ -3,7 +3,8 @@ package api
 import (
 	"context"
 
-	crud "github.com/NpoolPlatform/authing-gateway/pkg/crud/authhistory"
+	appauthcrud "github.com/NpoolPlatform/authing-gateway/pkg/crud/appauth"
+	authhistorycrud "github.com/NpoolPlatform/authing-gateway/pkg/crud/authhistory"
 	mw "github.com/NpoolPlatform/authing-gateway/pkg/middleware/authing"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool/authinggateway"
@@ -31,7 +32,7 @@ func (s *Server) AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleU
 }
 
 func (s *Server) GetAuthHistories(ctx context.Context, in *npool.GetAuthHistoriesRequest) (*npool.GetAuthHistoriesResponse, error) {
-	resp, err := crud.GetByAppUser(ctx, in)
+	resp, err := authhistorycrud.GetByAppUser(ctx, in)
 	if err != nil {
 		logger.Sugar().Errorf("fail get auth histories by app user: %v", err)
 		return &npool.GetAuthHistoriesResponse{}, status.Error(codes.Internal, err.Error())
@@ -40,7 +41,7 @@ func (s *Server) GetAuthHistories(ctx context.Context, in *npool.GetAuthHistorie
 }
 
 func (s *Server) GetAuthHistoriesByApp(ctx context.Context, in *npool.GetAuthHistoriesByAppRequest) (*npool.GetAuthHistoriesByAppResponse, error) {
-	resp, err := crud.GetByApp(ctx, in)
+	resp, err := authhistorycrud.GetByApp(ctx, in)
 	if err != nil {
 		logger.Sugar().Errorf("fail get auth histories by app: %v", err)
 		return &npool.GetAuthHistoriesByAppResponse{}, status.Error(codes.Internal, err.Error())
@@ -49,7 +50,7 @@ func (s *Server) GetAuthHistoriesByApp(ctx context.Context, in *npool.GetAuthHis
 }
 
 func (s *Server) GetAuthHistoriesByOtherApp(ctx context.Context, in *npool.GetAuthHistoriesByOtherAppRequest) (*npool.GetAuthHistoriesByOtherAppResponse, error) {
-	resp, err := crud.GetByApp(ctx, &npool.GetAuthHistoriesByAppRequest{
+	resp, err := authhistorycrud.GetByApp(ctx, &npool.GetAuthHistoriesByAppRequest{
 		AppID: in.GetTargetAppID(),
 	})
 	if err != nil {
@@ -62,7 +63,16 @@ func (s *Server) GetAuthHistoriesByOtherApp(ctx context.Context, in *npool.GetAu
 }
 
 func (s *Server) CreateAppAuthForOtherApp(ctx context.Context, in *npool.CreateAppAuthForOtherAppRequest) (*npool.CreateAppAuthForOtherAppResponse, error) {
-	return nil, nil
+	info := in.GetInfo()
+	info.AppID = in.GetTargetAppID()
+	resp, err := appauthcrud.CreateForOtherApp(ctx, &npool.CreateAppAuthForOtherAppRequest{
+		Info: info,
+	})
+	if err != nil {
+		logger.Sugar().Errorf("fail create app auth by other app: %v", err)
+		return &npool.CreateAppAuthForOtherAppResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return resp, nil
 }
 
 func (s *Server) GetAppAuthByAppResourceMethod(ctx context.Context, in *npool.GetAppAuthByAppResourceMethodRequest) (*npool.GetAppAuthByAppResourceMethodResponse, error) {
