@@ -169,3 +169,39 @@ func GetByApp(ctx context.Context, appID string) ([]*npool.Auth, error) {
 
 	return appAuths, nil
 }
+
+func GetByAppResourceMethod(ctx context.Context, appID, resource, method string) ([]*npool.Auth, error) {
+	if _, err := uuid.Parse(appID); err != nil {
+		return nil, xerrors.Errorf("invalid app id: %v", err)
+	}
+
+	cli, err := db.Client()
+	if err != nil {
+		return nil, xerrors.Errorf("fail get db: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, dbTimeout)
+	defer cancel()
+
+	infos, err := cli.
+		AppRoleAuth.
+		Query().
+		Where(
+			approleauth.And(
+				approleauth.AppID(uuid.MustParse(appID)),
+				approleauth.Resource(resource),
+				approleauth.Method(method),
+			),
+		).
+		All(ctx)
+	if err != nil {
+		return nil, xerrors.Errorf("fail query app role uth: %v", err)
+	}
+
+	appAuths := []*npool.Auth{}
+	for _, info := range infos {
+		appAuths = append(appAuths, dbRowToAuth(info))
+	}
+
+	return appAuths, nil
+}

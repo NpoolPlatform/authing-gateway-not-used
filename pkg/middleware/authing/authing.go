@@ -39,12 +39,49 @@ func AuthByApp(ctx context.Context, in *npool.AuthByAppRequest) (*npool.AuthByAp
 	if err != nil {
 		return nil, xerrors.Errorf("fail get app: %v", err)
 	}
-
 	if resp.Info == nil {
 		return nil, xerrors.Errorf("fail get app")
 	}
 
 	allowed = resp.Info.Ban == nil
+	if !allowed {
+		return &npool.AuthByAppResponse{
+			Allowed: false,
+		}, nil
+	}
+
+	resp1, err := appauthcrud.GetByAppResourceMethod(ctx, &npool.GetAppAuthByAppResourceMethodRequest{
+		AppID:    in.GetAppID(),
+		Resource: in.GetResource(),
+		Method:   in.GetMethod(),
+	})
+	if err != nil {
+		return nil, xerrors.Errorf("fail get app auth by resource method: %v", err)
+	}
+	if resp1.Info != nil {
+		allowed = true
+		return &npool.AuthByAppResponse{
+			Allowed: allowed,
+		}, nil
+	}
+
+	auths, err := approleauthcrud.GetByAppResourceMethod(ctx, in.GetAppID(), in.GetResource(), in.GetMethod())
+	if err != nil {
+		return nil, xerrors.Errorf("fail get app role auth by app resource method: %v", err)
+	}
+	if len(auths) > 0 {
+		return &npool.AuthByAppResponse{
+			Allowed: allowed,
+		}, nil
+	}
+
+	auths, err = appuserauthcrud.GetByAppResourceMethod(ctx, in.GetAppID(), in.GetResource(), in.GetMethod())
+	if err != nil {
+		return nil, xerrors.Errorf("fail get app userg auth by app resource method: %v", err)
+	}
+	if len(auths) > 0 {
+		allowed = true
+	}
 
 	return &npool.AuthByAppResponse{
 		Allowed: allowed,
@@ -109,13 +146,46 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 	if resp2.Info == nil {
 		return nil, xerrors.Errorf("user not login")
 	}
+	if resp2.Info.Roles == nil {
+		return nil, xerrors.Errorf("invalid user roles")
+	}
 
-	// TODO: check role access authorization to resource
+	resp3, err := appuserauthcrud.GetByAppUserResourceMethod(ctx, &npool.GetAppUserAuthByAppUserResourceMethodRequest{
+		AppID:    in.GetAppID(),
+		UserID:   in.GetUserID(),
+		Resource: in.GetResource(),
+		Method:   in.GetMethod(),
+	})
+	if err != nil {
+		return nil, xerrors.Errorf("fail get app user auth by app user resource method: %v", err)
+	}
+	if resp3.Info != nil {
+		allowed = true
+		return &npool.AuthByAppRoleUserResponse{
+			Allowed: allowed,
+		}, nil
+	}
 
-	allowed = true
+	for _, role := range resp2.Info.Roles {
+		resp, err := approleauthcrud.GetByAppRoleResourceMethod(ctx, &npool.GetAppRoleAuthByAppRoleResourceMethodRequest{
+			AppID:    in.GetAppID(),
+			RoleID:   role.ID,
+			Resource: in.GetResource(),
+			Method:   in.GetMethod(),
+		})
+		if err != nil {
+			return nil, xerrors.Errorf("fail get app role auth by app role resource method: %v", err)
+		}
+		if resp.Info != nil {
+			allowed = true
+			return &npool.AuthByAppRoleUserResponse{
+				Allowed: allowed,
+			}, nil
+		}
+	}
 
 	return &npool.AuthByAppRoleUserResponse{
-		Allowed: true,
+		Allowed: false,
 	}, nil
 }
 
