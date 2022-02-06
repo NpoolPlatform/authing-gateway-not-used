@@ -34,11 +34,11 @@ spec:
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: authing-gateway-traefik-app-ingress
+  name: authing-gateway-traefik-app-user-ingress
   namespace: kube-system
   annotations:
-    k8s.kuboard.cn/displayName: authing-gateway-traefik-app
-    k8s.kuboard.cn/workload: authing-gateway-traefik-app
+    k8s.kuboard.cn/displayName: authing-gateway-traefik-app-user
+    k8s.kuboard.cn/workload: authing-gateway-traefik-app-user
     kubernetes.io/ingress.class: "traefik-internet"
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
     traefik.ingress.kubernetes.io/router.middlewares: kube-system-strip-authing-gateway-prefix@kubernetescrd,
@@ -61,3 +61,4 @@ spec:
       http: *http_rules
     - host: api.xpool.top
       http: *http_rules
+
