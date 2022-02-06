@@ -30,16 +30,18 @@ func AuthByApp(ctx context.Context, in *npool.AuthByAppRequest) (*npool.AuthByAp
 		}
 	}()
 
-	resp, err := grpc2.GetApp(ctx, &appusermgrpb.GetAppRequest{
+	resp, err := grpc2.GetAppInfo(ctx, &appusermgrpb.GetAppInfoRequest{
 		ID: in.GetAppID(),
 	})
 	if err != nil {
 		return nil, xerrors.Errorf("fail get app: %v", err)
 	}
 
-	// TODO: if app is banned, not allow
+	if resp.Info == nil {
+		return nil, xerrors.Errorf("fail get app")
+	}
 
-	allowed = resp.Info != nil
+	allowed = resp.Info.Ban == nil
 
 	return &npool.AuthByAppResponse{
 		Allowed: allowed,
