@@ -227,25 +227,67 @@ func (s *Server) DeleteAppUserAuth(ctx context.Context, in *npool.DeleteAppUserA
 }
 
 func (s *Server) GetAuthsByApp(ctx context.Context, in *npool.GetAuthsByAppRequest) (*npool.GetAuthsByAppResponse, error) {
-	return nil, nil
+	resp, err := mw.GetAuthsByApp(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorf("fail get by app: %v", err)
+		return &npool.GetAuthsByAppResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return resp, nil
 }
 
 func (s *Server) GetAuthsByOtherApp(ctx context.Context, in *npool.GetAuthsByOtherAppRequest) (*npool.GetAuthsByOtherAppResponse, error) {
-	return nil, nil
+	resp, err := mw.GetAuthsByApp(ctx, &npool.GetAuthsByAppRequest{
+		AppID: in.GetTargetAppID(),
+	})
+	if err != nil {
+		logger.Sugar().Errorf("fail get by app: %v", err)
+		return &npool.GetAuthsByOtherAppResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return &npool.GetAuthsByOtherAppResponse{
+		Infos: resp.Infos,
+	}, nil
 }
 
 func (s *Server) GetAuthsByAppRole(ctx context.Context, in *npool.GetAuthsByAppRoleRequest) (*npool.GetAuthsByAppRoleResponse, error) {
-	return nil, nil
+	resp, err := mw.GetAuthsByAppRole(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorf("fail get by app role: %v", err)
+		return &npool.GetAuthsByAppRoleResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return resp, nil
 }
 
 func (s *Server) GetAuthsByOtherAppRole(ctx context.Context, in *npool.GetAuthsByOtherAppRoleRequest) (*npool.GetAuthsByOtherAppRoleResponse, error) {
-	return nil, nil
+	resp, err := mw.GetAuthsByAppRole(ctx, &npool.GetAuthsByAppRoleRequest{
+		AppID: in.GetTargetAppID(),
+	})
+	if err != nil {
+		logger.Sugar().Errorf("fail get by app: %v", err)
+		return &npool.GetAuthsByOtherAppRoleResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return &npool.GetAuthsByOtherAppRoleResponse{
+		Infos: resp.Infos,
+	}, nil
 }
 
 func (s *Server) GetAuthsByAppUser(ctx context.Context, in *npool.GetAuthsByAppUserRequest) (*npool.GetAuthsByAppUserResponse, error) {
-	return nil, nil
+	resp, err := mw.GetAuthsByAppUser(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorf("fail get by app user: %v", err)
+		return &npool.GetAuthsByAppUserResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return resp, nil
 }
 
 func (s *Server) GetAuthsByOtherAppUser(ctx context.Context, in *npool.GetAuthsByOtherAppUserRequest) (*npool.GetAuthsByOtherAppUserResponse, error) {
-	return nil, nil
+	resp, err := mw.GetAuthsByAppUser(ctx, &npool.GetAuthsByAppUserRequest{
+		AppID: in.GetTargetAppID(),
+	})
+	if err != nil {
+		logger.Sugar().Errorf("fail get by app: %v", err)
+		return &npool.GetAuthsByOtherAppUserResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return &npool.GetAuthsByOtherAppUserResponse{
+		Infos: resp.Infos,
+	}, nil
 }

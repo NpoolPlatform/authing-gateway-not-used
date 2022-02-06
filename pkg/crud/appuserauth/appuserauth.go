@@ -22,7 +22,7 @@ func validateAppUserAuth(info *npool.AppUserAuth) error {
 		return xerrors.Errorf("invalid app id: %v", err)
 	}
 	if _, err := uuid.Parse(info.GetUserID()); err != nil {
-		return xerrors.Errorf("invalid role id: %v", err)
+		return xerrors.Errorf("invalid user id: %v", err)
 	}
 	if info.GetResource() == "" || info.GetMethod() == "" {
 		return xerrors.Errorf("invalid resource")
@@ -136,4 +136,36 @@ func Delete(ctx context.Context, in *npool.DeleteAppUserAuthRequest) (*npool.Del
 	return &npool.DeleteAppUserAuthResponse{
 		Info: dbRowToAuth(info),
 	}, nil
+}
+
+func GetByApp(ctx context.Context, appID string) ([]*npool.Auth, error) {
+	if _, err := uuid.Parse(appID); err != nil {
+		return nil, xerrors.Errorf("invalid app id: %v", err)
+	}
+
+	cli, err := db.Client()
+	if err != nil {
+		return nil, xerrors.Errorf("fail get db: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, dbTimeout)
+	defer cancel()
+
+	infos, err := cli.
+		AppUserAuth.
+		Query().
+		Where(
+			appuserauth.AppID(uuid.MustParse(appID)),
+		).
+		All(ctx)
+	if err != nil {
+		return nil, xerrors.Errorf("fail query app user auth: %v", err)
+	}
+
+	appAuths := []*npool.Auth{}
+	for _, info := range infos {
+		appAuths = append(appAuths, dbRowToAuth(info))
+	}
+
+	return appAuths, nil
 }
