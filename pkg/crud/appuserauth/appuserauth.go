@@ -22,19 +22,19 @@ func validateAppUserAuth(info *npool.AppUserAuth) error {
 	return nil
 }
 
-func CreateAppUserAuth(ctx context.Context, in *npool.CreateAppUserAuthRequest) (*npool.CreateAppUserAuthResponse, error) {
+func Create(ctx context.Context, in *npool.CreateAppUserAuthRequest) (*npool.CreateAppUserAuthResponse, error) {
 	return nil, nil
 }
 
-func CreateAppUserAuthForOtherApp(ctx context.Context, in *npool.CreateAppUserAuthForOtherAppRequest) (*npool.CreateAppUserAuthForOtherAppResponse, error) {
+func CreateForOtherApp(ctx context.Context, in *npool.CreateAppUserAuthForOtherAppRequest) (*npool.CreateAppUserAuthForOtherAppResponse, error) {
 	return nil, nil
 }
 
-func GetAppAuthByAppUserResourceMethod(ctx context.Context, in *npool.GetAppAuthByAppUserResourceMethodRequest) (*npool.GetAppAuthByAppUserResourceMethodResponse, error) {
+func GetByAppUserResourceMethod(ctx context.Context, in *npool.GetAppUserAuthByAppUserResourceMethodRequest) (*npool.GetAppUserAuthByAppUserResourceMethodResponse, error) {
 	return nil, nil
 }
 
-func GetAppAuthByOtherAppUserResourceMethod(ctx context.Context, in *npool.GetAppAuthByOtherAppUserResourceMethodRequest) (*npool.GetAppAuthByOtherAppUserResourceMethodResponse, error) {
+func GetByOtherAppUserResourceMethod(ctx context.Context, in *npool.GetAppUserAuthByOtherAppUserResourceMethodRequest) (*npool.GetAppUserAuthByOtherAppUserResourceMethodResponse, error) {
 	return nil, nil
 }
 

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	appauthcrud "github.com/NpoolPlatform/authing-gateway/pkg/crud/appauth"
+	approleauthcrud "github.com/NpoolPlatform/authing-gateway/pkg/crud/approleauth"
 	authhistorycrud "github.com/NpoolPlatform/authing-gateway/pkg/crud/authhistory"
 	mw "github.com/NpoolPlatform/authing-gateway/pkg/middleware/authing"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
@@ -76,7 +77,7 @@ func (s *Server) CreateAppAuthForOtherApp(ctx context.Context, in *npool.CreateA
 }
 
 func (s *Server) GetAppAuthByAppResourceMethod(ctx context.Context, in *npool.GetAppAuthByAppResourceMethodRequest) (*npool.GetAppAuthByAppResourceMethodResponse, error) {
-	resp, err := appauthcrud.GetAppAuthByAppResourceMethod(ctx, in)
+	resp, err := appauthcrud.GetByAppResourceMethod(ctx, in)
 	if err != nil {
 		logger.Sugar().Errorf("fail get app auth by app resource method: %v", err)
 		return &npool.GetAppAuthByAppResourceMethodResponse{}, status.Error(codes.Internal, err.Error())
@@ -85,7 +86,7 @@ func (s *Server) GetAppAuthByAppResourceMethod(ctx context.Context, in *npool.Ge
 }
 
 func (s *Server) GetAppAuthByOtherAppResourceMethod(ctx context.Context, in *npool.GetAppAuthByOtherAppResourceMethodRequest) (*npool.GetAppAuthByOtherAppResourceMethodResponse, error) {
-	resp, err := appauthcrud.GetAppAuthByAppResourceMethod(ctx, &npool.GetAppAuthByAppResourceMethodRequest{
+	resp, err := appauthcrud.GetByAppResourceMethod(ctx, &npool.GetAppAuthByAppResourceMethodRequest{
 		AppID:    in.GetTargetAppID(),
 		Resource: in.GetResource(),
 		Method:   in.GetMethod(),
@@ -102,30 +103,68 @@ func (s *Server) GetAppAuthByOtherAppResourceMethod(ctx context.Context, in *npo
 func (s *Server) DeleteAppAuth(ctx context.Context, in *npool.DeleteAppAuthRequest) (*npool.DeleteAppAuthResponse, error) {
 	resp, err := appauthcrud.Delete(ctx, in)
 	if err != nil {
-		logger.Sugar().Errorf("fail delelp auth: %v", err)
+		logger.Sugar().Errorf("fail delelt auth: %v", err)
 		return &npool.DeleteAppAuthResponse{}, status.Error(codes.Internal, err.Error())
 	}
 	return resp, nil
 }
 
 func (s *Server) CreateAppRoleAuth(ctx context.Context, in *npool.CreateAppRoleAuthRequest) (*npool.CreateAppRoleAuthResponse, error) {
-	return nil, nil
+	resp, err := approleauthcrud.Create(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorf("fail create app role auth by: %v", err)
+		return &npool.CreateAppRoleAuthResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return resp, nil
 }
 
 func (s *Server) CreateAppRoleAuthForOtherApp(ctx context.Context, in *npool.CreateAppRoleAuthForOtherAppRequest) (*npool.CreateAppRoleAuthForOtherAppResponse, error) {
-	return nil, nil
+	info := in.GetInfo()
+	info.AppID = in.GetTargetAppID()
+	resp, err := approleauthcrud.Create(ctx, &npool.CreateAppRoleAuthRequest{
+		Info: info,
+	})
+	if err != nil {
+		logger.Sugar().Errorf("fail create app auth by other app: %v", err)
+		return &npool.CreateAppRoleAuthForOtherAppResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return &npool.CreateAppRoleAuthForOtherAppResponse{
+		Info: resp.Info,
+	}, nil
 }
 
-func (s *Server) GetAppAuthByAppRoleResourceMethod(ctx context.Context, in *npool.GetAppAuthByAppRoleResourceMethodRequest) (*npool.GetAppAuthByAppRoleResourceMethodResponse, error) {
-	return nil, nil
+func (s *Server) GetAppRoleAuthByAppRoleResourceMethod(ctx context.Context, in *npool.GetAppRoleAuthByAppRoleResourceMethodRequest) (*npool.GetAppRoleAuthByAppRoleResourceMethodResponse, error) {
+	resp, err := approleauthcrud.GetByAppRoleResourceMethod(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorf("fail get app role auth by app resource method: %v", err)
+		return &npool.GetAppRoleAuthByAppRoleResourceMethodResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return resp, nil
 }
 
-func (s *Server) GetAppAuthByOtherAppRoleResourceMethod(ctx context.Context, in *npool.GetAppAuthByOtherAppRoleResourceMethodRequest) (*npool.GetAppAuthByOtherAppRoleResourceMethodResponse, error) {
-	return nil, nil
+func (s *Server) GetAppRoleAuthByOtherAppRoleResourceMethod(ctx context.Context, in *npool.GetAppRoleAuthByOtherAppRoleResourceMethodRequest) (*npool.GetAppRoleAuthByOtherAppRoleResourceMethodResponse, error) {
+	resp, err := approleauthcrud.GetByAppRoleResourceMethod(ctx, &npool.GetAppRoleAuthByAppRoleResourceMethodRequest{
+		AppID:    in.GetTargetAppID(),
+		RoleID:   in.GetRoleID(),
+		Resource: in.GetResource(),
+		Method:   in.GetMethod(),
+	})
+	if err != nil {
+		logger.Sugar().Errorf("fail get app role auth by other app resource method: %v", err)
+		return &npool.GetAppRoleAuthByOtherAppRoleResourceMethodResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return &npool.GetAppRoleAuthByOtherAppRoleResourceMethodResponse{
+		Info: resp.Info,
+	}, nil
 }
 
 func (s *Server) DeleteAppRoleAuth(ctx context.Context, in *npool.DeleteAppRoleAuthRequest) (*npool.DeleteAppRoleAuthResponse, error) {
-	return nil, nil
+	resp, err := approleauthcrud.Delete(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorf("fail delelt auth: %v", err)
+		return &npool.DeleteAppRoleAuthResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return resp, nil
 }
 
 func (s *Server) CreateAppUserAuth(ctx context.Context, in *npool.CreateAppUserAuthRequest) (*npool.CreateAppUserAuthResponse, error) {
@@ -136,11 +175,11 @@ func (s *Server) CreateAppUserAuthForOtherApp(ctx context.Context, in *npool.Cre
 	return nil, nil
 }
 
-func (s *Server) GetAppAuthByAppUserResourceMethod(ctx context.Context, in *npool.GetAppAuthByAppUserResourceMethodRequest) (*npool.GetAppAuthByAppUserResourceMethodResponse, error) {
+func (s *Server) GetAppUserAuthByAppUserResourceMethod(ctx context.Context, in *npool.GetAppUserAuthByAppUserResourceMethodRequest) (*npool.GetAppUserAuthByAppUserResourceMethodResponse, error) {
 	return nil, nil
 }
 
-func (s *Server) GetAppAuthByOtherAppUserResourceMethod(ctx context.Context, in *npool.GetAppAuthByOtherAppUserResourceMethodRequest) (*npool.GetAppAuthByOtherAppUserResourceMethodResponse, error) {
+func (s *Server) GetAppUserAuthByOtherAppUserResourceMethod(ctx context.Context, in *npool.GetAppUserAuthByOtherAppUserResourceMethodRequest) (*npool.GetAppUserAuthByOtherAppUserResourceMethodResponse, error) {
 	return nil, nil
 }
 

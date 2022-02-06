@@ -65,7 +65,7 @@ func CreateForOtherApp(ctx context.Context, in *npool.CreateAppAuthForOtherAppRe
 	}, nil
 }
 
-func GetAppAuthByAppResourceMethod(ctx context.Context, in *npool.GetAppAuthByAppResourceMethodRequest) (*npool.GetAppAuthByAppResourceMethodResponse, error) {
+func GetByAppResourceMethod(ctx context.Context, in *npool.GetAppAuthByAppResourceMethodRequest) (*npool.GetAppAuthByAppResourceMethodResponse, error) {
 	if _, err := uuid.Parse(in.GetAppID()); err != nil {
 		return nil, xerrors.Errorf("invalid app id: %v", err)
 	}
