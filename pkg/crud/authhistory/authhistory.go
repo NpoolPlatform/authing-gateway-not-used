@@ -101,3 +101,48 @@ func GetByAppUser(ctx context.Context, in *npool.GetAuthHistoriesRequest) (*npoo
 		Infos: ahs,
 	}, nil
 }
+
+func GetByApp(ctx context.Context, in *npool.GetAuthHistoriesByAppRequest) (*npool.GetAuthHistoriesByAppResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, grpcTimeout)
+	defer cancel()
+
+	cli, err := db.Client()
+	if err != nil {
+		return nil, xerrors.Errorf("fail get db client: %v", err)
+	}
+
+	appID, err := uuid.Parse(in.GetAppID())
+	if err != nil {
+		return nil, xerrors.Errorf("invalid app id: %v", err)
+	}
+
+	infos, err := cli.
+		AuthHistory.
+		Query().
+		Where(
+			authhistory.And(
+				authhistory.AppID(appID),
+			),
+		).
+		All(ctx)
+	if err != nil {
+		return nil, xerrors.Errorf("fail query auth history: %v", err)
+	}
+
+	ahs := []*npool.AuthHistory{}
+	for _, info := range infos {
+		ahs = append(ahs, &npool.AuthHistory{
+			ID:       info.ID.String(),
+			AppID:    info.AppID.String(),
+			UserID:   info.UserID.String(),
+			Resource: info.Resource,
+			Method:   info.Method,
+			Allowed:  info.Allowed,
+			CreateAt: info.CreateAt,
+		})
+	}
+
+	return &npool.GetAuthHistoriesByAppResponse{
+		Infos: ahs,
+	}, nil
+}

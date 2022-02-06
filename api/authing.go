@@ -38,3 +38,25 @@ func (s *Server) GetAuthHistories(ctx context.Context, in *npool.GetAuthHistorie
 	}
 	return resp, nil
 }
+
+func (s *Server) GetAuthHistoriesByApp(ctx context.Context, in *npool.GetAuthHistoriesByAppRequest) (*npool.GetAuthHistoriesByAppResponse, error) {
+	resp, err := crud.GetByApp(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorf("fail get auth histories by app: %v", err)
+		return &npool.GetAuthHistoriesByAppResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return resp, nil
+}
+
+func (s *Server) GetAuthHistoriesByOtherApp(ctx context.Context, in *npool.GetAuthHistoriesByOtherAppRequest) (*npool.GetAuthHistoriesByOtherAppResponse, error) {
+	resp, err := crud.GetByApp(ctx, &npool.GetAuthHistoriesByAppRequest{
+		AppID: in.GetTargetAppID(),
+	})
+	if err != nil {
+		logger.Sugar().Errorf("fail get auth histories by other app: %v", err)
+		return &npool.GetAuthHistoriesByOtherAppResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return &npool.GetAuthHistoriesByOtherAppResponse{
+		Infos: resp.Infos,
+	}, nil
+}
