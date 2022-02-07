@@ -105,7 +105,9 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 	}()
 
 	resp, err := AuthByApp(ctx, &npool.AuthByAppRequest{
-		AppID: in.GetAppID(),
+		AppID:    in.GetAppID(),
+		Resource: in.GetResource(),
+		Method:   in.GetMethod(),
 	})
 	if err != nil {
 		return nil, xerrors.Errorf("fail auth by app: %v", err)
