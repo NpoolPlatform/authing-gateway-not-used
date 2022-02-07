@@ -53,20 +53,32 @@ func Create(ctx context.Context, in *npool.CreateAppRoleAuthRequest) (*npool.Cre
 	ctx, cancel := context.WithTimeout(ctx, dbTimeout)
 	defer cancel()
 
-	info, err := cli.
+	err = cli.
 		AppRoleAuth.
 		Create().
 		SetAppID(uuid.MustParse(in.GetInfo().GetAppID())).
 		SetRoleID(uuid.MustParse(in.GetInfo().GetRoleID())).
 		SetResource(in.GetInfo().GetResource()).
 		SetMethod(in.GetInfo().GetMethod()).
-		Save(ctx)
+		OnConflict().
+		UpdateNewValues().
+		Exec(ctx)
 	if err != nil {
 		return nil, xerrors.Errorf("fail create app role auth: %v", err)
 	}
 
+	resp, err := GetByAppRoleResourceMethod(ctx, &npool.GetAppRoleAuthByAppRoleResourceMethodRequest{
+		AppID:    in.GetInfo().GetAppID(),
+		RoleID:   in.GetInfo().GetRoleID(),
+		Resource: in.GetInfo().GetResource(),
+		Method:   in.GetInfo().GetMethod(),
+	})
+	if err != nil {
+		return nil, xerrors.Errorf("fail get app role auth: %v", err)
+	}
+
 	return &npool.CreateAppRoleAuthResponse{
-		Info: dbRowToAuth(info),
+		Info: resp.Info,
 	}, nil
 }
 

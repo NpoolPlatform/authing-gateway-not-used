@@ -53,20 +53,32 @@ func Create(ctx context.Context, in *npool.CreateAppUserAuthRequest) (*npool.Cre
 	ctx, cancel := context.WithTimeout(ctx, dbTimeout)
 	defer cancel()
 
-	info, err := cli.
+	err = cli.
 		AppUserAuth.
 		Create().
 		SetAppID(uuid.MustParse(in.GetInfo().GetAppID())).
 		SetUserID(uuid.MustParse(in.GetInfo().GetUserID())).
 		SetResource(in.GetInfo().GetResource()).
 		SetMethod(in.GetInfo().GetMethod()).
-		Save(ctx)
+		OnConflict().
+		UpdateNewValues().
+		Exec(ctx)
 	if err != nil {
 		return nil, xerrors.Errorf("fail create app user auth: %v", err)
 	}
 
+	resp, err := GetByAppUserResourceMethod(ctx, &npool.GetAppUserAuthByAppUserResourceMethodRequest{
+		AppID:    in.GetInfo().GetAppID(),
+		UserID:   in.GetInfo().GetUserID(),
+		Resource: in.GetInfo().GetResource(),
+		Method:   in.GetInfo().GetMethod(),
+	})
+	if err != nil {
+		return nil, xerrors.Errorf("fail get app user auth: %v", err)
+	}
+
 	return &npool.CreateAppUserAuthResponse{
-		Info: dbRowToAuth(info),
+		Info: resp.Info,
 	}, nil
 }
 

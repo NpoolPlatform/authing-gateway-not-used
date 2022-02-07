@@ -49,19 +49,33 @@ func CreateForOtherApp(ctx context.Context, in *npool.CreateAppAuthForOtherAppRe
 	ctx, cancel := context.WithTimeout(ctx, dbTimeout)
 	defer cancel()
 
-	info, err := cli.
+	err = cli.
 		AppAuth.
 		Create().
 		SetAppID(uuid.MustParse(in.GetInfo().GetAppID())).
 		SetResource(in.GetInfo().GetResource()).
 		SetMethod(in.GetInfo().GetMethod()).
-		Save(ctx)
+		OnConflict().
+		UpdateNewValues().
+		Exec(ctx)
 	if err != nil {
 		return nil, xerrors.Errorf("fail create app auth: %v", err)
 	}
 
+	resp, err := GetByAppResourceMethod(ctx, &npool.GetAppAuthByAppResourceMethodRequest{
+		AppID:    in.GetInfo().GetAppID(),
+		Resource: in.GetInfo().GetResource(),
+		Method:   in.GetInfo().GetMethod(),
+	})
+	if err != nil {
+		return nil, xerrors.Errorf("fail get app auth: %v", err)
+	}
+	if resp.Info == nil {
+		return nil, xerrors.Errorf("fail get app auth")
+	}
+
 	return &npool.CreateAppAuthForOtherAppResponse{
-		Info: dbRowToAuth(info),
+		Info: resp.Info,
 	}, nil
 }
 
