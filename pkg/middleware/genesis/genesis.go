@@ -24,11 +24,11 @@ type genesisURL struct {
 	Method string
 }
 
-func processGenesisURLs(urls []genesisURL) {
+func processGenesisURLs(urls []genesisURL, appID string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	auths, err := appauthcrud.GetByApp(ctx, appusermgrconstant.GenesisAppID)
+	auths, err := appauthcrud.GetByApp(ctx, appID)
 	if err != nil {
 		logger.Sugar().Infof("fail get genesis app auth: %v", err)
 		return
@@ -56,7 +56,7 @@ func processGenesisURLs(urls []genesisURL) {
 	for _, url := range myURLs {
 		_, err := appauthcrud.CreateForOtherApp(ctx, &npool.CreateAppAuthForOtherAppRequest{
 			Info: &npool.AppAuth{
-				AppID:    appusermgrconstant.GenesisAppID,
+				AppID:    appID,
 				Resource: url.Path,
 				Method:   url.Method,
 			},
@@ -76,7 +76,8 @@ func watch() {
 	err := json.Unmarshal([]byte(urlsJSON), &urls)
 	if err == nil {
 		logger.Sugar().Infof("process genesis urls: %v", urls)
-		processGenesisURLs(urls)
+		processGenesisURLs(urls, appusermgrconstant.GenesisAppID)
+		processGenesisURLs(urls, appusermgrconstant.ChurchAppID)
 	} else {
 		logger.Sugar().Warnf("invalid urls %v: %v", urlsJSON, err)
 	}
