@@ -9,6 +9,7 @@ import (
 	msglistener "github.com/NpoolPlatform/authing-gateway/pkg/message/listener"
 	msg "github.com/NpoolPlatform/authing-gateway/pkg/message/message"
 	msgsrv "github.com/NpoolPlatform/authing-gateway/pkg/message/server"
+	genesis "github.com/NpoolPlatform/authing-gateway/pkg/middleware/genesis"
 
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
@@ -46,6 +47,8 @@ var runCmd = &cli.Command{
 
 		go msglistener.Listen()
 		go msgSender()
+
+		go genesis.Watch()
 
 		return grpc2.RunGRPCGateWay(rpcGatewayRegister)
 	},
