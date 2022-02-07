@@ -58,6 +58,7 @@ func AuthByApp(ctx context.Context, in *npool.AuthByAppRequest) (*npool.AuthByAp
 		return nil, xerrors.Errorf("fail get app auth by resource method: %v", err)
 	}
 	if resp1.Info != nil {
+		allowed = true
 		return &npool.AuthByAppResponse{
 			Allowed: allowed,
 		}, nil
