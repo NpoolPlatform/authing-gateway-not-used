@@ -51,6 +51,21 @@ func GetAppUserInfo(ctx context.Context, in *appusermgrpb.GetAppUserInfoRequest)
 	return cli.GetAppUserInfo(ctx, in)
 }
 
+func GetGenesisAppRoleUsersByOtherApp(ctx context.Context, in *appusermgrpb.GetGenesisAppRoleUsersByOtherAppRequest) (*appusermgrpb.GetGenesisAppRoleUsersByOtherAppResponse, error) {
+	conn, err := grpc2.GetGRPCConn(appusermgrconst.ServiceName, grpc2.GRPCTAG)
+	if err != nil {
+		return nil, xerrors.Errorf("fail get app user connection: %v", err)
+	}
+	defer conn.Close()
+
+	cli := appusermgrpb.NewAppUserManagerClient(conn)
+
+	ctx, cancel := context.WithTimeout(ctx, grpcTimeout)
+	defer cancel()
+
+	return cli.GetGenesisAppRoleUsersByOtherApp(ctx, in)
+}
+
 //---------------------------------------------------------------------------------------------------------------------------
 
 func Logined(ctx context.Context, in *logingwpb.LoginedRequest) (*logingwpb.LoginedResponse, error) {

@@ -8,10 +8,15 @@ import (
 	appusermgrconstant "github.com/NpoolPlatform/appuser-manager/pkg/const"
 	"github.com/NpoolPlatform/go-service-framework/pkg/config"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
 	npool "github.com/NpoolPlatform/message/npool/authinggateway"
 
 	constant "github.com/NpoolPlatform/authing-gateway/pkg/const"
 	appauthcrud "github.com/NpoolPlatform/authing-gateway/pkg/crud/appauth"
+	appuserauthcrud "github.com/NpoolPlatform/authing-gateway/pkg/crud/appuserauth"
+	grpc2 "github.com/NpoolPlatform/authing-gateway/pkg/grpc"
+
+	"golang.org/x/xerrors"
 )
 
 type genesisURL struct {
@@ -75,8 +80,6 @@ func watch() {
 	} else {
 		logger.Sugar().Warnf("invalid urls %v: %v", urlsJSON, err)
 	}
-
-	// TODO: authorize authing apis to genesis user (need retry)
 }
 
 func Watch() {
@@ -85,4 +88,65 @@ func Watch() {
 		watch()
 		<-ticker.C
 	}
+}
+
+func createAppUserAuths(ctx context.Context, appID string) ([]*npool.Auth, error) {
+	hostname := config.GetStringValueWithNameSpace("", config.KeyHostname)
+	apisJSON := config.GetStringValueWithNameSpace(hostname, constant.KeyGenesisAuthingAPIs)
+	apis := []genesisURL{}
+	err := json.Unmarshal([]byte(apisJSON), &apis)
+	if err != nil {
+		return nil, xerrors.Errorf("fail parse genesis authing apis: %v", err)
+	}
+	if len(apis) == 0 {
+		return nil, xerrors.Errorf("genesis authing apis not available")
+	}
+
+	resp, err := grpc2.GetGenesisAppRoleUsersByOtherApp(ctx, &appusermgrpb.GetGenesisAppRoleUsersByOtherAppRequest{
+		TargetAppID: appID,
+	})
+	if err != nil {
+		return nil, xerrors.Errorf("fail get genesis app role users: %v", err)
+	}
+
+	auths := []*npool.Auth{}
+
+	for _, user := range resp.Infos {
+		for _, api := range apis {
+			resp1, err := appuserauthcrud.Create(ctx, &npool.CreateAppUserAuthRequest{
+				Info: &npool.AppUserAuth{
+					AppID:    appID,
+					UserID:   user.UserID,
+					Resource: api.Path,
+					Method:   api.Method,
+				},
+			})
+			if err != nil {
+				return nil, xerrors.Errorf("fail create app user auth: %v", err)
+			}
+			auths = append(auths, resp1.Info)
+		}
+	}
+
+	return auths, nil
+}
+
+func CreateGenesisAppUserAuth(ctx context.Context, in *npool.CreateGenesisAppUserAuthRequest) (*npool.CreateGenesisAppUserAuthResponse, error) {
+	allAuths := []*npool.Auth{}
+
+	auths, err := createAppUserAuths(ctx, appusermgrconstant.GenesisAppID)
+	if err != nil {
+		return nil, xerrors.Errorf("fail create genesis app user auths: %v", err)
+	}
+	allAuths = append(allAuths, auths...)
+
+	auths, err = createAppUserAuths(ctx, appusermgrconstant.ChurchAppID)
+	if err != nil {
+		return nil, xerrors.Errorf("fail create church app user auths: %v", err)
+	}
+	allAuths = append(allAuths, auths...)
+
+	return &npool.CreateGenesisAppUserAuthResponse{
+		Infos: allAuths,
+	}, nil
 }

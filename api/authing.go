@@ -7,7 +7,8 @@ import (
 	approleauthcrud "github.com/NpoolPlatform/authing-gateway/pkg/crud/approleauth"
 	appuserauthcrud "github.com/NpoolPlatform/authing-gateway/pkg/crud/appuserauth"
 	authhistorycrud "github.com/NpoolPlatform/authing-gateway/pkg/crud/authhistory"
-	mw "github.com/NpoolPlatform/authing-gateway/pkg/middleware/authing"
+	authingmw "github.com/NpoolPlatform/authing-gateway/pkg/middleware/authing"
+	genesismw "github.com/NpoolPlatform/authing-gateway/pkg/middleware/genesis"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool/authinggateway"
 
@@ -16,7 +17,7 @@ import (
 )
 
 func (s *Server) AuthByApp(ctx context.Context, in *npool.AuthByAppRequest) (*npool.AuthByAppResponse, error) {
-	resp, err := mw.AuthByApp(ctx, in)
+	resp, err := authingmw.AuthByApp(ctx, in)
 	if err != nil {
 		logger.Sugar().Errorf("fail auth by app: %v", err)
 		return &npool.AuthByAppResponse{}, status.Error(codes.Internal, err.Error())
@@ -25,7 +26,7 @@ func (s *Server) AuthByApp(ctx context.Context, in *npool.AuthByAppRequest) (*np
 }
 
 func (s *Server) AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) (*npool.AuthByAppRoleUserResponse, error) {
-	resp, err := mw.AuthByAppRoleUser(ctx, in)
+	resp, err := authingmw.AuthByAppRoleUser(ctx, in)
 	if err != nil {
 		logger.Sugar().Errorf("fail auth by app role user: %v", err)
 		return &npool.AuthByAppRoleUserResponse{}, status.Error(codes.Internal, err.Error())
@@ -177,6 +178,15 @@ func (s *Server) CreateAppUserAuth(ctx context.Context, in *npool.CreateAppUserA
 	return resp, nil
 }
 
+func (s *Server) CreateGenesisAppUserAuth(ctx context.Context, in *npool.CreateGenesisAppUserAuthRequest) (*npool.CreateGenesisAppUserAuthResponse, error) {
+	resp, err := genesismw.CreateGenesisAppUserAuth(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorf("fail create genesis app user auth: %v", err)
+		return &npool.CreateGenesisAppUserAuthResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	return resp, nil
+}
+
 func (s *Server) CreateAppUserAuthForOtherApp(ctx context.Context, in *npool.CreateAppUserAuthForOtherAppRequest) (*npool.CreateAppUserAuthForOtherAppResponse, error) {
 	info := in.GetInfo()
 	info.AppID = in.GetTargetAppID()
@@ -227,7 +237,7 @@ func (s *Server) DeleteAppUserAuth(ctx context.Context, in *npool.DeleteAppUserA
 }
 
 func (s *Server) GetAuthsByApp(ctx context.Context, in *npool.GetAuthsByAppRequest) (*npool.GetAuthsByAppResponse, error) {
-	resp, err := mw.GetAuthsByApp(ctx, in)
+	resp, err := authingmw.GetAuthsByApp(ctx, in)
 	if err != nil {
 		logger.Sugar().Errorf("fail get by app: %v", err)
 		return &npool.GetAuthsByAppResponse{}, status.Error(codes.Internal, err.Error())
@@ -236,7 +246,7 @@ func (s *Server) GetAuthsByApp(ctx context.Context, in *npool.GetAuthsByAppReque
 }
 
 func (s *Server) GetAuthsByOtherApp(ctx context.Context, in *npool.GetAuthsByOtherAppRequest) (*npool.GetAuthsByOtherAppResponse, error) {
-	resp, err := mw.GetAuthsByApp(ctx, &npool.GetAuthsByAppRequest{
+	resp, err := authingmw.GetAuthsByApp(ctx, &npool.GetAuthsByAppRequest{
 		AppID: in.GetTargetAppID(),
 	})
 	if err != nil {
@@ -249,7 +259,7 @@ func (s *Server) GetAuthsByOtherApp(ctx context.Context, in *npool.GetAuthsByOth
 }
 
 func (s *Server) GetAuthsByAppRole(ctx context.Context, in *npool.GetAuthsByAppRoleRequest) (*npool.GetAuthsByAppRoleResponse, error) {
-	resp, err := mw.GetAuthsByAppRole(ctx, in)
+	resp, err := authingmw.GetAuthsByAppRole(ctx, in)
 	if err != nil {
 		logger.Sugar().Errorf("fail get by app role: %v", err)
 		return &npool.GetAuthsByAppRoleResponse{}, status.Error(codes.Internal, err.Error())
@@ -258,7 +268,7 @@ func (s *Server) GetAuthsByAppRole(ctx context.Context, in *npool.GetAuthsByAppR
 }
 
 func (s *Server) GetAuthsByOtherAppRole(ctx context.Context, in *npool.GetAuthsByOtherAppRoleRequest) (*npool.GetAuthsByOtherAppRoleResponse, error) {
-	resp, err := mw.GetAuthsByAppRole(ctx, &npool.GetAuthsByAppRoleRequest{
+	resp, err := authingmw.GetAuthsByAppRole(ctx, &npool.GetAuthsByAppRoleRequest{
 		AppID: in.GetTargetAppID(),
 	})
 	if err != nil {
@@ -271,7 +281,7 @@ func (s *Server) GetAuthsByOtherAppRole(ctx context.Context, in *npool.GetAuthsB
 }
 
 func (s *Server) GetAuthsByAppUser(ctx context.Context, in *npool.GetAuthsByAppUserRequest) (*npool.GetAuthsByAppUserResponse, error) {
-	resp, err := mw.GetAuthsByAppUser(ctx, in)
+	resp, err := authingmw.GetAuthsByAppUser(ctx, in)
 	if err != nil {
 		logger.Sugar().Errorf("fail get by app user: %v", err)
 		return &npool.GetAuthsByAppUserResponse{}, status.Error(codes.Internal, err.Error())
@@ -280,7 +290,7 @@ func (s *Server) GetAuthsByAppUser(ctx context.Context, in *npool.GetAuthsByAppU
 }
 
 func (s *Server) GetAuthsByOtherAppUser(ctx context.Context, in *npool.GetAuthsByOtherAppUserRequest) (*npool.GetAuthsByOtherAppUserResponse, error) {
-	resp, err := mw.GetAuthsByAppUser(ctx, &npool.GetAuthsByAppUserRequest{
+	resp, err := authingmw.GetAuthsByAppUser(ctx, &npool.GetAuthsByAppUserRequest{
 		AppID: in.GetTargetAppID(),
 	})
 	if err != nil {
