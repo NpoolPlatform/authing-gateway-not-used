@@ -17,19 +17,21 @@ import (
 	"golang.org/x/xerrors"
 )
 
-func AuthByApp(ctx context.Context, in *npool.AuthByAppRequest) (*npool.AuthByAppResponse, error) {
+func AuthByApp(ctx context.Context, in *npool.AuthByAppRequest, persistent bool) (*npool.AuthByAppResponse, error) {
 	allowed := false
 
 	defer func() {
-		err := authhistorycrud.Create(ctx, &npool.AuthHistory{
-			AppID:    in.GetAppID(),
-			UserID:   uuid.UUID{}.String(),
-			Resource: in.GetResource(),
-			Method:   in.GetMethod(),
-			Allowed:  allowed,
-		})
-		if err != nil {
-			logger.Sugar().Errorf("fail create auth history: %v", err)
+		if persistent {
+			err := authhistorycrud.Create(ctx, &npool.AuthHistory{
+				AppID:    in.GetAppID(),
+				UserID:   uuid.UUID{}.String(),
+				Resource: in.GetResource(),
+				Method:   in.GetMethod(),
+				Allowed:  allowed,
+			})
+			if err != nil {
+				logger.Sugar().Errorf("fail create auth history: %v", err)
+			}
 		}
 	}()
 
@@ -108,7 +110,7 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 		AppID:    in.GetAppID(),
 		Resource: in.GetResource(),
 		Method:   in.GetMethod(),
-	})
+	}, false)
 	if err != nil {
 		return nil, xerrors.Errorf("fail auth by app: %v", err)
 	}

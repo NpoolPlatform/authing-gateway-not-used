@@ -17,7 +17,7 @@ import (
 )
 
 func (s *Server) AuthByApp(ctx context.Context, in *npool.AuthByAppRequest) (*npool.AuthByAppResponse, error) {
-	resp, err := authingmw.AuthByApp(ctx, in)
+	resp, err := authingmw.AuthByApp(ctx, in, true)
 	if err != nil {
 		logger.Sugar().Errorf("fail auth by app: %v", err)
 		return &npool.AuthByAppResponse{}, status.Error(codes.Internal, err.Error())
