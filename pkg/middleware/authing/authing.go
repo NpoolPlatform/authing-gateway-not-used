@@ -88,7 +88,7 @@ func AuthByApp(ctx context.Context, in *npool.AuthByAppRequest) (*npool.AuthByAp
 	}, nil
 }
 
-func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) (*npool.AuthByAppRoleUserResponse, error) {
+func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) (*npool.AuthByAppRoleUserResponse, error) { //nolint
 	allowed := false
 
 	defer func() {
