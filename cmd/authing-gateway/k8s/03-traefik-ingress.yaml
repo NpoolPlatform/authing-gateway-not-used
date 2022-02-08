@@ -65,6 +65,10 @@ spec:
             backend:
               serviceName: authing-gateway
               servicePort: 50250
+          - path: /api/authing-gateway/v1/delete/app
+            backend:
+              serviceName: authing-gateway
+              servicePort: 50250
     - host: api.procyon.vip
       http: *http_rules
     - host: api.xpool.top
