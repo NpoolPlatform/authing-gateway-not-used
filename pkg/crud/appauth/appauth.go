@@ -100,6 +100,7 @@ func GetByAppResourceMethod(ctx context.Context, in *npool.GetAppAuthByAppResour
 				appauth.AppID(uuid.MustParse(in.GetAppID())),
 				appauth.Resource(in.GetResource()),
 				appauth.Method(in.GetMethod()),
+				appauth.DeleteAt(0),
 			),
 		).
 		All(ctx)
@@ -164,6 +165,7 @@ func GetByApp(ctx context.Context, appID string) ([]*npool.Auth, error) {
 		Query().
 		Where(
 			appauth.AppID(uuid.MustParse(appID)),
+			appauth.DeleteAt(0),
 		).
 		All(ctx)
 	if err != nil {
