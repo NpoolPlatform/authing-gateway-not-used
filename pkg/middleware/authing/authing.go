@@ -147,11 +147,19 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 	if resp2.Info == nil {
 		return nil, xerrors.Errorf("user not login")
 	}
-	if resp2.Info.Roles == nil {
+
+	resp3, err := grpc2.GetUserRolesByAppUser(ctx, &appusermgrpb.GetUserRolesByAppUserRequest{
+		AppID:  in.GetAppID(),
+		UserID: in.GetUserID(),
+	})
+	if err != nil {
+		return nil, xerrors.Errorf("fail get user roles: %v", err)
+	}
+	if resp3.Infos == nil || len(resp3.Infos) == 0 {
 		return nil, xerrors.Errorf("invalid user roles")
 	}
 
-	resp3, err := appuserauthcrud.GetByAppUserResourceMethod(ctx, &npool.GetAppUserAuthByAppUserResourceMethodRequest{
+	resp4, err := appuserauthcrud.GetByAppUserResourceMethod(ctx, &npool.GetAppUserAuthByAppUserResourceMethodRequest{
 		AppID:    in.GetAppID(),
 		UserID:   in.GetUserID(),
 		Resource: in.GetResource(),
@@ -160,14 +168,14 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 	if err != nil {
 		return nil, xerrors.Errorf("fail get app user auth by app user resource method: %v", err)
 	}
-	if resp3.Info != nil {
+	if resp4.Info != nil {
 		allowed = true
 		return &npool.AuthByAppRoleUserResponse{
 			Allowed: allowed,
 		}, nil
 	}
 
-	for _, role := range resp2.Info.Roles {
+	for _, role := range resp3.Infos {
 		resp, err := approleauthcrud.GetByAppRoleResourceMethod(ctx, &npool.GetAppRoleAuthByAppRoleResourceMethodRequest{
 			AppID:    in.GetAppID(),
 			RoleID:   role.ID,
