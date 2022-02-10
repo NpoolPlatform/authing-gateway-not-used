@@ -190,6 +190,7 @@ func (s *Server) CreateGenesisAppUserAuth(ctx context.Context, in *npool.CreateG
 func (s *Server) CreateAppUserAuthForOtherApp(ctx context.Context, in *npool.CreateAppUserAuthForOtherAppRequest) (*npool.CreateAppUserAuthForOtherAppResponse, error) {
 	info := in.GetInfo()
 	info.AppID = in.GetTargetAppID()
+	info.UserID = in.GetTargetUserID()
 	resp, err := appuserauthcrud.Create(ctx, &npool.CreateAppUserAuthRequest{
 		Info: info,
 	})

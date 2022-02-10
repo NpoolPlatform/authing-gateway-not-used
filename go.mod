@@ -8,7 +8,7 @@ require (
 	github.com/NpoolPlatform/appuser-manager v0.0.0-20220206145102-74eb783ed3b5
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20220127085959-4940540d8042
 	github.com/NpoolPlatform/login-gateway v0.0.0-20220127094538-a90390aa0e0e
-	github.com/NpoolPlatform/message v0.0.0-20220207024016-d2fa9a33e308
+	github.com/NpoolPlatform/message v0.0.0-20220210081212-e58c8bd4ef19
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.2
@@ -16,7 +16,7 @@ require (
 	github.com/stretchr/testify v1.7.1-0.20210427113832-6241f9ab9942
 	github.com/urfave/cli/v2 v2.3.0
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
-	google.golang.org/grpc v1.43.0
+	google.golang.org/grpc v1.44.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0
 	google.golang.org/protobuf v1.27.1
 )
