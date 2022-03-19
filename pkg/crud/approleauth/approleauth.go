@@ -87,6 +87,10 @@ func GetByAppRoleResourceMethod(ctx context.Context, in *npool.GetAppRoleAuthByA
 		return nil, xerrors.Errorf("invalid app id: %v", err)
 	}
 
+	if _, err := uuid.Parse(in.GetRoleID()); err != nil {
+		return nil, xerrors.Errorf("invalid role id: %v", err)
+	}
+
 	cli, err := db.Client()
 	if err != nil {
 		return nil, xerrors.Errorf("fail get db: %v", err)
