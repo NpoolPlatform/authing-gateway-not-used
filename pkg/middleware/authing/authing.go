@@ -185,7 +185,7 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 			Method:   in.GetMethod(),
 		})
 		if err != nil {
-			return nil, xerrors.Errorf("fail get app role auth by app role resource method: %v", err)
+			return nil, xerrors.Errorf("fail get app role auth by app role resource method: %v [%v]", err, role)
 		}
 		if resp.Info != nil {
 			allowed = true
