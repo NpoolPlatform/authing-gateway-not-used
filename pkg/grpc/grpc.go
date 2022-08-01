@@ -7,7 +7,7 @@ import (
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 
 	appusermgrconst "github.com/NpoolPlatform/appuser-manager/pkg/message/const" //nolint
-	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
+	appusermgrpb "github.com/NpoolPlatform/message/npool/appuser/mgr/v1"
 
 	logingwconst "github.com/NpoolPlatform/login-gateway/pkg/message/const"
 	logingwpb "github.com/NpoolPlatform/message/npool/logingateway"

@@ -9,7 +9,7 @@ import (
 	authhistorycrud "github.com/NpoolPlatform/authing-gateway/pkg/crud/authhistory"
 	grpc2 "github.com/NpoolPlatform/authing-gateway/pkg/grpc"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
-	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
+	appusermgrpb "github.com/NpoolPlatform/message/npool/appuser/mgr/v1"
 	npool "github.com/NpoolPlatform/message/npool/authinggateway"
 	logingwpb "github.com/NpoolPlatform/message/npool/logingateway"
 
