@@ -8,7 +8,7 @@ import (
 	appusermgrconstant "github.com/NpoolPlatform/appuser-manager/pkg/const"
 	"github.com/NpoolPlatform/go-service-framework/pkg/config"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
-	appusermgrpb "github.com/NpoolPlatform/message/npool/appusermgr"
+	appusermgrpb "github.com/NpoolPlatform/message/npool/appuser/mgr/v1"
 	npool "github.com/NpoolPlatform/message/npool/authinggateway"
 
 	constant "github.com/NpoolPlatform/authing-gateway/pkg/const"

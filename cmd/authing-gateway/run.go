@@ -1,14 +1,8 @@
 package main
 
 import (
-	"time"
-
 	"github.com/NpoolPlatform/authing-gateway/api"
 	db "github.com/NpoolPlatform/authing-gateway/pkg/db"
-	msgcli "github.com/NpoolPlatform/authing-gateway/pkg/message/client"
-	msglistener "github.com/NpoolPlatform/authing-gateway/pkg/message/listener"
-	msg "github.com/NpoolPlatform/authing-gateway/pkg/message/message"
-	msgsrv "github.com/NpoolPlatform/authing-gateway/pkg/message/server"
 	genesis "github.com/NpoolPlatform/authing-gateway/pkg/middleware/genesis"
 
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
@@ -38,16 +32,6 @@ var runCmd = &cli.Command{
 			}
 		}()
 
-		if err := msgsrv.Init(); err != nil {
-			return err
-		}
-		if err := msgcli.Init(); err != nil {
-			return err
-		}
-
-		go msglistener.Listen()
-		go msgSender()
-
 		go genesis.Watch()
 
 		return grpc2.RunGRPCGateWay(rpcGatewayRegister)
@@ -68,20 +52,4 @@ func rpcGatewayRegister(mux *runtime.ServeMux, endpoint string, opts []grpc.Dial
 	apimgrcli.Register(mux)
 
 	return nil
-}
-
-func msgSender() {
-	id := 0
-	for {
-		err := msgsrv.PublishExample(&msg.Example{
-			ID:      id,
-			Example: "hello world",
-		})
-		if err != nil {
-			logger.Sugar().Errorf("fail to send example: %v", err)
-			return
-		}
-		id++
-		time.Sleep(3 * time.Second)
-	}
 }
