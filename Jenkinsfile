@@ -1,7 +1,7 @@
 pipeline {
   agent any
   environment {
-    GOPROXY = 'https://goproxy.cn,direct'
+    GOPROXY = 'https://proxy.golang.com.cn,direct'
   }
   tools {
     go 'go'
@@ -121,6 +121,17 @@ pipeline {
       steps {
         sh 'make verify-build'
         sh 'DEVELOPMENT=development DOCKER_REGISTRY=$DOCKER_REGISTRY make generate-docker-images'
+      }
+    }
+
+    stage('Generate docker image for feature test') {
+      when {
+        expression { BUILD_TARGET == 'true' }
+        expression { BRANCH_NAME != 'master' }
+      }
+      steps {
+        sh 'make verify-build'
+        sh 'DEVELOPMENT=feature DOCKER_REGISTRY=$DOCKER_REGISTRY make generate-docker-images'
       }
     }
 
@@ -260,6 +271,15 @@ pipeline {
             docker rmi $image -f
           done
         '''.stripIndent())
+      }
+    }
+
+    stage('Release docker image for feature test') {
+      when {
+        expression { RELEASE_TARGET == 'true' }
+      }
+      steps {
+        sh 'TAG=feature DOCKER_REGISTRY=$DOCKER_REGISTRY make release-docker-images'
       }
     }
 
