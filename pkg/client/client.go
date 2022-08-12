@@ -40,3 +40,20 @@ func CreateGenesisAppUserAuth(ctx context.Context, in *npool.CreateGenesisAppUse
 
 	return info.(*npool.CreateGenesisAppUserAuthResponse), nil
 }
+
+func GetAuthsByOtherApp(ctx context.Context, appID string) ([]*npool.Auth, error) {
+	info, err := do(ctx, func(_ctx context.Context, cli npool.AuthingGatewayClient) (cruder.Any, error) {
+		resp, err := cli.GetAuthsByOtherApp(ctx, &npool.GetAuthsByOtherAppRequest{
+			TargetAppID: appID,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("fail get auth: %v", err)
+		}
+		return resp.Infos, nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fail get auth: %v", err)
+	}
+
+	return info.([]*npool.Auth), nil
+}
