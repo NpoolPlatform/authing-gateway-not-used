@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
@@ -11,8 +12,6 @@ import (
 
 	logingwconst "github.com/NpoolPlatform/login-gateway/pkg/message/const"
 	logingwpb "github.com/NpoolPlatform/message/npool/logingateway"
-
-	"golang.org/x/xerrors"
 )
 
 const (
@@ -24,7 +23,7 @@ const (
 func GetAppInfo(ctx context.Context, in *appusermgrpb.GetAppInfoRequest) (*appusermgrpb.GetAppInfoResponse, error) {
 	conn, err := grpc2.GetGRPCConn(appusermgrconst.ServiceName, grpc2.GRPCTAG)
 	if err != nil {
-		return nil, xerrors.Errorf("fail get app user connection: %v", err)
+		return nil, fmt.Errorf("fail get app user connection: %v", err)
 	}
 	defer conn.Close()
 
@@ -39,7 +38,7 @@ func GetAppInfo(ctx context.Context, in *appusermgrpb.GetAppInfoRequest) (*appus
 func GetAppUserInfo(ctx context.Context, in *appusermgrpb.GetAppUserInfoRequest) (*appusermgrpb.GetAppUserInfoResponse, error) {
 	conn, err := grpc2.GetGRPCConn(appusermgrconst.ServiceName, grpc2.GRPCTAG)
 	if err != nil {
-		return nil, xerrors.Errorf("fail get app user connection: %v", err)
+		return nil, fmt.Errorf("fail get app user connection: %v", err)
 	}
 	defer conn.Close()
 
@@ -54,7 +53,7 @@ func GetAppUserInfo(ctx context.Context, in *appusermgrpb.GetAppUserInfoRequest)
 func GetGenesisAppRoleUsersByOtherApp(ctx context.Context, in *appusermgrpb.GetGenesisAppRoleUsersByOtherAppRequest) (*appusermgrpb.GetGenesisAppRoleUsersByOtherAppResponse, error) {
 	conn, err := grpc2.GetGRPCConn(appusermgrconst.ServiceName, grpc2.GRPCTAG)
 	if err != nil {
-		return nil, xerrors.Errorf("fail get app user connection: %v", err)
+		return nil, fmt.Errorf("fail get app user connection: %v", err)
 	}
 	defer conn.Close()
 
@@ -69,7 +68,7 @@ func GetGenesisAppRoleUsersByOtherApp(ctx context.Context, in *appusermgrpb.GetG
 func GetUserRolesByAppUser(ctx context.Context, in *appusermgrpb.GetUserRolesByAppUserRequest) (*appusermgrpb.GetUserRolesByAppUserResponse, error) {
 	conn, err := grpc2.GetGRPCConn(appusermgrconst.ServiceName, grpc2.GRPCTAG)
 	if err != nil {
-		return nil, xerrors.Errorf("fail get app user connection: %v", err)
+		return nil, fmt.Errorf("fail get app user connection: %v", err)
 	}
 	defer conn.Close()
 
@@ -86,7 +85,7 @@ func GetUserRolesByAppUser(ctx context.Context, in *appusermgrpb.GetUserRolesByA
 func Logined(ctx context.Context, in *logingwpb.LoginedRequest) (*logingwpb.LoginedResponse, error) {
 	conn, err := grpc2.GetGRPCConn(logingwconst.ServiceName, grpc2.GRPCTAG)
 	if err != nil {
-		return nil, xerrors.Errorf("fail get login gateway connection: %v", err)
+		return nil, fmt.Errorf("fail get login gateway connection: %v", err)
 	}
 	defer conn.Close()
 

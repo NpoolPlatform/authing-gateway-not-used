@@ -2,6 +2,7 @@ package authing
 
 import (
 	"context"
+	"fmt"
 
 	appauthcrud "github.com/NpoolPlatform/authing-gateway/pkg/crud/appauth"
 	approleauthcrud "github.com/NpoolPlatform/authing-gateway/pkg/crud/approleauth"
@@ -14,7 +15,6 @@ import (
 	logingwpb "github.com/NpoolPlatform/message/npool/logingateway"
 
 	"github.com/google/uuid"
-	"golang.org/x/xerrors"
 )
 
 func AuthByApp(ctx context.Context, in *npool.AuthByAppRequest, persistent bool) (*npool.AuthByAppResponse, error) {
@@ -39,10 +39,10 @@ func AuthByApp(ctx context.Context, in *npool.AuthByAppRequest, persistent bool)
 		ID: in.GetAppID(),
 	})
 	if err != nil {
-		return nil, xerrors.Errorf("fail get app: %v", err)
+		return nil, fmt.Errorf("fail get app: %v", err)
 	}
 	if resp.Info == nil {
-		return nil, xerrors.Errorf("fail get app")
+		return nil, fmt.Errorf("fail get app")
 	}
 
 	if resp.Info.Ban != nil {
@@ -57,7 +57,7 @@ func AuthByApp(ctx context.Context, in *npool.AuthByAppRequest, persistent bool)
 		Method:   in.GetMethod(),
 	})
 	if err != nil {
-		return nil, xerrors.Errorf("fail get app auth by resource method: %v", err)
+		return nil, fmt.Errorf("fail get app auth by resource method: %v", err)
 	}
 	if resp1.Info != nil {
 		allowed = true
@@ -68,7 +68,7 @@ func AuthByApp(ctx context.Context, in *npool.AuthByAppRequest, persistent bool)
 
 	auths, err := approleauthcrud.GetByAppResourceMethod(ctx, in.GetAppID(), in.GetResource(), in.GetMethod())
 	if err != nil {
-		return nil, xerrors.Errorf("fail get app role auth by app resource method: %v", err)
+		return nil, fmt.Errorf("fail get app role auth by app resource method: %v", err)
 	}
 	if len(auths) > 0 {
 		allowed = true
@@ -79,7 +79,7 @@ func AuthByApp(ctx context.Context, in *npool.AuthByAppRequest, persistent bool)
 
 	auths, err = appuserauthcrud.GetByAppResourceMethod(ctx, in.GetAppID(), in.GetResource(), in.GetMethod())
 	if err != nil {
-		return nil, xerrors.Errorf("fail get app userg auth by app resource method: %v", err)
+		return nil, fmt.Errorf("fail get app userg auth by app resource method: %v", err)
 	}
 	if len(auths) > 0 {
 		allowed = true
@@ -112,7 +112,7 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 		Method:   in.GetMethod(),
 	}, false)
 	if err != nil {
-		return nil, xerrors.Errorf("fail auth by app: %v", err)
+		return nil, fmt.Errorf("fail auth by app: %v", err)
 	}
 	if !resp.Allowed {
 		return &npool.AuthByAppRoleUserResponse{
@@ -124,7 +124,7 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 		ID: in.GetUserID(),
 	})
 	if err != nil {
-		return nil, xerrors.Errorf("fail get app user: %v", err)
+		return nil, fmt.Errorf("fail get app user: %v", err)
 	}
 	if resp1.Info == nil {
 		return &npool.AuthByAppRoleUserResponse{
@@ -144,10 +144,10 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 		Token:  in.GetToken(),
 	})
 	if err != nil {
-		return nil, xerrors.Errorf("user not login: %v", err)
+		return nil, fmt.Errorf("user not login: %v", err)
 	}
 	if resp2.Info == nil {
-		return nil, xerrors.Errorf("user not login")
+		return nil, fmt.Errorf("user not login")
 	}
 
 	resp3, err := grpc2.GetUserRolesByAppUser(ctx, &appusermgrpb.GetUserRolesByAppUserRequest{
@@ -155,10 +155,10 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 		UserID: in.GetUserID(),
 	})
 	if err != nil {
-		return nil, xerrors.Errorf("fail get user roles: %v", err)
+		return nil, fmt.Errorf("fail get user roles: %v", err)
 	}
 	if resp3.Infos == nil || len(resp3.Infos) == 0 {
-		return nil, xerrors.Errorf("invalid user roles")
+		return nil, fmt.Errorf("invalid user roles")
 	}
 
 	resp4, err := appuserauthcrud.GetByAppUserResourceMethod(ctx, &npool.GetAppUserAuthByAppUserResourceMethodRequest{
@@ -168,7 +168,7 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 		Method:   in.GetMethod(),
 	})
 	if err != nil {
-		return nil, xerrors.Errorf("fail get app user auth by app user resource method: %v", err)
+		return nil, fmt.Errorf("fail get app user auth by app user resource method: %v", err)
 	}
 	if resp4.Info != nil {
 		allowed = true
@@ -185,7 +185,7 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 			Method:   in.GetMethod(),
 		})
 		if err != nil {
-			return nil, xerrors.Errorf("fail get app role auth by app role resource method: %v [%v]", err, role)
+			return nil, fmt.Errorf("fail get app role auth by app role resource method: %v [%v]", err, role)
 		}
 		if resp.Info != nil {
 			allowed = true
@@ -203,7 +203,7 @@ func AuthByAppRoleUser(ctx context.Context, in *npool.AuthByAppRoleUserRequest) 
 func GetAuthsByAppRole(ctx context.Context, in *npool.GetAuthsByAppRoleRequest) (*npool.GetAuthsByAppRoleResponse, error) {
 	auths, err := approleauthcrud.GetByApp(ctx, in.GetAppID())
 	if err != nil {
-		return nil, xerrors.Errorf("fail get by app: %v", err)
+		return nil, fmt.Errorf("fail get by app: %v", err)
 	}
 	return &npool.GetAuthsByAppRoleResponse{
 		Infos: auths,
@@ -213,7 +213,7 @@ func GetAuthsByAppRole(ctx context.Context, in *npool.GetAuthsByAppRoleRequest) 
 func GetAuthsByAppUser(ctx context.Context, in *npool.GetAuthsByAppUserRequest) (*npool.GetAuthsByAppUserResponse, error) {
 	auths, err := appuserauthcrud.GetByApp(ctx, in.GetAppID())
 	if err != nil {
-		return nil, xerrors.Errorf("fail get by app: %v", err)
+		return nil, fmt.Errorf("fail get by app: %v", err)
 	}
 	return &npool.GetAuthsByAppUserResponse{
 		Infos: auths,
@@ -225,19 +225,19 @@ func GetAuthsByApp(ctx context.Context, in *npool.GetAuthsByAppRequest) (*npool.
 
 	auths, err := approleauthcrud.GetByApp(ctx, in.GetAppID())
 	if err != nil {
-		return nil, xerrors.Errorf("fail get by app: %v", err)
+		return nil, fmt.Errorf("fail get by app: %v", err)
 	}
 	appAuths = append(appAuths, auths...)
 
 	auths, err = appuserauthcrud.GetByApp(ctx, in.GetAppID())
 	if err != nil {
-		return nil, xerrors.Errorf("fail get by app: %v", err)
+		return nil, fmt.Errorf("fail get by app: %v", err)
 	}
 	appAuths = append(appAuths, auths...)
 
 	auths, err = appauthcrud.GetByApp(ctx, in.GetAppID())
 	if err != nil {
-		return nil, xerrors.Errorf("fail get by app: %v", err)
+		return nil, fmt.Errorf("fail get by app: %v", err)
 	}
 	appAuths = append(appAuths, auths...)
 

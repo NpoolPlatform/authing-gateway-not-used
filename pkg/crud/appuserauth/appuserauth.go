@@ -2,6 +2,7 @@ package appuserauth
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/NpoolPlatform/authing-gateway/pkg/db"
@@ -10,7 +11,6 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/authinggateway"
 
 	"github.com/google/uuid"
-	"golang.org/x/xerrors"
 )
 
 const (
@@ -19,13 +19,13 @@ const (
 
 func validateAppUserAuth(info *npool.AppUserAuth) error {
 	if _, err := uuid.Parse(info.GetAppID()); err != nil {
-		return xerrors.Errorf("invalid app id: %v", err)
+		return fmt.Errorf("invalid app id: %v", err)
 	}
 	if _, err := uuid.Parse(info.GetUserID()); err != nil {
-		return xerrors.Errorf("invalid user id: %v", err)
+		return fmt.Errorf("invalid user id: %v", err)
 	}
 	if info.GetResource() == "" || info.GetMethod() == "" {
-		return xerrors.Errorf("invalid resource")
+		return fmt.Errorf("invalid resource")
 	}
 	return nil
 }
@@ -42,12 +42,12 @@ func dbRowToAuth(row *ent.AppUserAuth) *npool.Auth {
 
 func Create(ctx context.Context, in *npool.CreateAppUserAuthRequest) (*npool.CreateAppUserAuthResponse, error) {
 	if err := validateAppUserAuth(in.GetInfo()); err != nil {
-		return nil, xerrors.Errorf("invalid parameter: %v", err)
+		return nil, fmt.Errorf("invalid parameter: %v", err)
 	}
 
 	cli, err := db.Client()
 	if err != nil {
-		return nil, xerrors.Errorf("fail get db: %v", err)
+		return nil, fmt.Errorf("fail get db: %v", err)
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, dbTimeout)
@@ -64,7 +64,7 @@ func Create(ctx context.Context, in *npool.CreateAppUserAuthRequest) (*npool.Cre
 		UpdateNewValues().
 		Exec(ctx)
 	if err != nil {
-		return nil, xerrors.Errorf("fail create app user auth: %v", err)
+		return nil, fmt.Errorf("fail create app user auth: %v", err)
 	}
 
 	resp, err := GetByAppUserResourceMethod(ctx, &npool.GetAppUserAuthByAppUserResourceMethodRequest{
@@ -74,7 +74,7 @@ func Create(ctx context.Context, in *npool.CreateAppUserAuthRequest) (*npool.Cre
 		Method:   in.GetInfo().GetMethod(),
 	})
 	if err != nil {
-		return nil, xerrors.Errorf("fail get app user auth: %v", err)
+		return nil, fmt.Errorf("fail get app user auth: %v", err)
 	}
 
 	return &npool.CreateAppUserAuthResponse{
@@ -84,12 +84,12 @@ func Create(ctx context.Context, in *npool.CreateAppUserAuthRequest) (*npool.Cre
 
 func GetByAppUserResourceMethod(ctx context.Context, in *npool.GetAppUserAuthByAppUserResourceMethodRequest) (*npool.GetAppUserAuthByAppUserResourceMethodResponse, error) {
 	if _, err := uuid.Parse(in.GetAppID()); err != nil {
-		return nil, xerrors.Errorf("invalid app id: %v", err)
+		return nil, fmt.Errorf("invalid app id: %v", err)
 	}
 
 	cli, err := db.Client()
 	if err != nil {
-		return nil, xerrors.Errorf("fail get db: %v", err)
+		return nil, fmt.Errorf("fail get db: %v", err)
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, dbTimeout)
@@ -108,7 +108,7 @@ func GetByAppUserResourceMethod(ctx context.Context, in *npool.GetAppUserAuthByA
 		).
 		All(ctx)
 	if err != nil {
-		return nil, xerrors.Errorf("fail query app user auth: %v", err)
+		return nil, fmt.Errorf("fail query app user auth: %v", err)
 	}
 
 	var appAuth *npool.Auth
@@ -125,12 +125,12 @@ func GetByAppUserResourceMethod(ctx context.Context, in *npool.GetAppUserAuthByA
 func Delete(ctx context.Context, in *npool.DeleteAppUserAuthRequest) (*npool.DeleteAppUserAuthResponse, error) {
 	id, err := uuid.Parse(in.GetID())
 	if err != nil {
-		return nil, xerrors.Errorf("invalid id: %v", err)
+		return nil, fmt.Errorf("invalid id: %v", err)
 	}
 
 	cli, err := db.Client()
 	if err != nil {
-		return nil, xerrors.Errorf("fail get db: %v", err)
+		return nil, fmt.Errorf("fail get db: %v", err)
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, dbTimeout)
@@ -142,7 +142,7 @@ func Delete(ctx context.Context, in *npool.DeleteAppUserAuthRequest) (*npool.Del
 		SetDeleteAt(uint32(time.Now().Unix())).
 		Save(ctx)
 	if err != nil {
-		return nil, xerrors.Errorf("fail update app user auth: %v", err)
+		return nil, fmt.Errorf("fail update app user auth: %v", err)
 	}
 
 	return &npool.DeleteAppUserAuthResponse{
@@ -152,12 +152,12 @@ func Delete(ctx context.Context, in *npool.DeleteAppUserAuthRequest) (*npool.Del
 
 func GetByApp(ctx context.Context, appID string) ([]*npool.Auth, error) {
 	if _, err := uuid.Parse(appID); err != nil {
-		return nil, xerrors.Errorf("invalid app id: %v", err)
+		return nil, fmt.Errorf("invalid app id: %v", err)
 	}
 
 	cli, err := db.Client()
 	if err != nil {
-		return nil, xerrors.Errorf("fail get db: %v", err)
+		return nil, fmt.Errorf("fail get db: %v", err)
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, dbTimeout)
@@ -171,7 +171,7 @@ func GetByApp(ctx context.Context, appID string) ([]*npool.Auth, error) {
 		).
 		All(ctx)
 	if err != nil {
-		return nil, xerrors.Errorf("fail query app user auth: %v", err)
+		return nil, fmt.Errorf("fail query app user auth: %v", err)
 	}
 
 	appAuths := []*npool.Auth{}
@@ -184,12 +184,12 @@ func GetByApp(ctx context.Context, appID string) ([]*npool.Auth, error) {
 
 func GetByAppResourceMethod(ctx context.Context, appID, resource, method string) ([]*npool.Auth, error) {
 	if _, err := uuid.Parse(appID); err != nil {
-		return nil, xerrors.Errorf("invalid app id: %v", err)
+		return nil, fmt.Errorf("invalid app id: %v", err)
 	}
 
 	cli, err := db.Client()
 	if err != nil {
-		return nil, xerrors.Errorf("fail get db: %v", err)
+		return nil, fmt.Errorf("fail get db: %v", err)
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, dbTimeout)
@@ -207,7 +207,7 @@ func GetByAppResourceMethod(ctx context.Context, appID, resource, method string)
 		).
 		All(ctx)
 	if err != nil {
-		return nil, xerrors.Errorf("fail query app user uth: %v", err)
+		return nil, fmt.Errorf("fail query app user uth: %v", err)
 	}
 
 	appAuths := []*npool.Auth{}

@@ -3,6 +3,7 @@ package genesis
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	appusermgrconstant "github.com/NpoolPlatform/appuser-manager/pkg/const"
@@ -15,8 +16,6 @@ import (
 	appauthcrud "github.com/NpoolPlatform/authing-gateway/pkg/crud/appauth"
 	appuserauthcrud "github.com/NpoolPlatform/authing-gateway/pkg/crud/appuserauth"
 	grpc2 "github.com/NpoolPlatform/authing-gateway/pkg/grpc"
-
-	"golang.org/x/xerrors"
 )
 
 type genesisURL struct {
@@ -97,17 +96,17 @@ func createAppUserAuths(ctx context.Context, appID string) ([]*npool.Auth, error
 	apis := []genesisURL{}
 	err := json.Unmarshal([]byte(apisJSON), &apis)
 	if err != nil {
-		return nil, xerrors.Errorf("fail parse genesis authing apis: %v", err)
+		return nil, fmt.Errorf("fail parse genesis authing apis: %v", err)
 	}
 	if len(apis) == 0 {
-		return nil, xerrors.Errorf("genesis authing apis not available")
+		return nil, fmt.Errorf("genesis authing apis not available")
 	}
 
 	resp, err := grpc2.GetGenesisAppRoleUsersByOtherApp(ctx, &appusermgrpb.GetGenesisAppRoleUsersByOtherAppRequest{
 		TargetAppID: appID,
 	})
 	if err != nil {
-		return nil, xerrors.Errorf("fail get genesis app role users: %v", err)
+		return nil, fmt.Errorf("fail get genesis app role users: %v", err)
 	}
 
 	auths := []*npool.Auth{}
@@ -123,7 +122,7 @@ func createAppUserAuths(ctx context.Context, appID string) ([]*npool.Auth, error
 				},
 			})
 			if err != nil {
-				return nil, xerrors.Errorf("fail create app user auth: %v", err)
+				return nil, fmt.Errorf("fail create app user auth: %v", err)
 			}
 			auths = append(auths, resp1.Info)
 		}
@@ -137,13 +136,13 @@ func CreateGenesisAppUserAuth(ctx context.Context, in *npool.CreateGenesisAppUse
 
 	auths, err := createAppUserAuths(ctx, appusermgrconstant.GenesisAppID)
 	if err != nil {
-		return nil, xerrors.Errorf("fail create genesis app user auths: %v", err)
+		return nil, fmt.Errorf("fail create genesis app user auths: %v", err)
 	}
 	allAuths = append(allAuths, auths...)
 
 	auths, err = createAppUserAuths(ctx, appusermgrconstant.ChurchAppID)
 	if err != nil {
-		return nil, xerrors.Errorf("fail create church app user auths: %v", err)
+		return nil, fmt.Errorf("fail create church app user auths: %v", err)
 	}
 	allAuths = append(allAuths, auths...)
 
