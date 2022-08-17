@@ -41,7 +41,7 @@ func CreateGenesisAppUserAuth(ctx context.Context, in *npool.CreateGenesisAppUse
 	return infos.([]*npool.Auth), nil
 }
 
-func GetAuths(ctx context.Context, appID string) ([]*npool.Auth, error) {
+func GetAppAuths(ctx context.Context, appID string) ([]*npool.Auth, error) {
 	infos, err := do(ctx, func(_ctx context.Context, cli npool.AuthingGatewayClient) (cruder.Any, error) {
 		resp, err := cli.GetAuthsByApp(ctx, &npool.GetAuthsByAppRequest{
 			AppID: appID,
