@@ -26,25 +26,25 @@ func do(ctx context.Context, fn func(_ctx context.Context, cli npool.AuthingGate
 	return fn(_ctx, cli)
 }
 
-func CreateGenesisAppUserAuth(ctx context.Context) (*npool.Auth, error) {
-	info, err := do(ctx, func(_ctx context.Context, cli npool.AuthingGatewayClient) (cruder.Any, error) {
+func CreateGenesisAppUserAuth(ctx context.Context) ([]*npool.Auth, error) {
+	infos, err := do(ctx, func(_ctx context.Context, cli npool.AuthingGatewayClient) (cruder.Any, error) {
 		resp, err := cli.CreateGenesisAppUserAuth(ctx, &npool.CreateGenesisAppUserAuthRequest{})
 		if err != nil {
 			return nil, fmt.Errorf("fail notify email: %v", err)
 		}
-		return resp, nil
+		return resp.Infos, nil
 	})
 	if err != nil {
 		return nil, fmt.Errorf("fail notify email: %v", err)
 	}
 
-	return info.(*npool.Auth), nil
+	return infos.([]*npool.Auth), nil
 }
 
 func GetAppAuths(ctx context.Context, appID string) ([]*npool.Auth, error) {
-	info, err := do(ctx, func(_ctx context.Context, cli npool.AuthingGatewayClient) (cruder.Any, error) {
-		resp, err := cli.GetAuthsByOtherApp(ctx, &npool.GetAuthsByOtherAppRequest{
-			TargetAppID: appID,
+	infos, err := do(ctx, func(_ctx context.Context, cli npool.AuthingGatewayClient) (cruder.Any, error) {
+		resp, err := cli.GetAuthsByApp(ctx, &npool.GetAuthsByAppRequest{
+			AppID: appID,
 		})
 		if err != nil {
 			return nil, fmt.Errorf("fail get auth: %v", err)
@@ -55,5 +55,5 @@ func GetAppAuths(ctx context.Context, appID string) ([]*npool.Auth, error) {
 		return nil, fmt.Errorf("fail get auth: %v", err)
 	}
 
-	return info.([]*npool.Auth), nil
+	return infos.([]*npool.Auth), nil
 }
