@@ -26,9 +26,9 @@ func do(ctx context.Context, fn func(_ctx context.Context, cli npool.AuthingGate
 	return fn(_ctx, cli)
 }
 
-func CreateGenesisAppUserAuth(ctx context.Context, in *npool.CreateGenesisAppUserAuthRequest) (*npool.CreateGenesisAppUserAuthResponse, error) {
+func CreateGenesisAppUserAuth(ctx context.Context) (*npool.Auth, error) {
 	info, err := do(ctx, func(_ctx context.Context, cli npool.AuthingGatewayClient) (cruder.Any, error) {
-		resp, err := cli.CreateGenesisAppUserAuth(ctx, in)
+		resp, err := cli.CreateGenesisAppUserAuth(ctx, &npool.CreateGenesisAppUserAuthRequest{})
 		if err != nil {
 			return nil, fmt.Errorf("fail notify email: %v", err)
 		}
@@ -38,10 +38,10 @@ func CreateGenesisAppUserAuth(ctx context.Context, in *npool.CreateGenesisAppUse
 		return nil, fmt.Errorf("fail notify email: %v", err)
 	}
 
-	return info.(*npool.CreateGenesisAppUserAuthResponse), nil
+	return info.(*npool.Auth), nil
 }
 
-func GetAuthsByOtherApp(ctx context.Context, appID string) ([]*npool.Auth, error) {
+func GetAppAuths(ctx context.Context, appID string) ([]*npool.Auth, error) {
 	info, err := do(ctx, func(_ctx context.Context, cli npool.AuthingGatewayClient) (cruder.Any, error) {
 		resp, err := cli.GetAuthsByOtherApp(ctx, &npool.GetAuthsByOtherAppRequest{
 			TargetAppID: appID,
